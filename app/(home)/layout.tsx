@@ -1,0 +1,65 @@
+import type { Metadata } from 'next';
+import { Poppins, Source_Sans_3 } from 'next/font/google';
+import '../globals.css';
+import { cn } from '@/lib/utils';
+import { Toaster } from '@/components/ui/sonner';
+import { AIAssistant } from './components/ai/assistant';
+import Header from '@/components/ui/header';
+import Footer from '@/components/footer';
+
+// Poppins - Used by Coursera, Udemy, and many modern learning platforms
+// Perfect for headings and UI elements
+const poppins = Poppins({ 
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  variable: '--font-poppins',
+  display: 'swap',
+});
+
+// Source Sans Pro - Used by Khan Academy, Cisco Learning, and edX
+// Excellent for body text and long-form content
+const sourceSans = Source_Sans_3({ 
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-source-sans',
+  display: 'swap',
+});
+
+export const metadata: Metadata = {
+  title: 'Z-Learn | AI-Powered Learning',
+  description: 'Personalized learning with AI tutoring - Transform your skills with cutting-edge education',
+  keywords: 'AI learning, online education, personalized tutoring, skill development',
+  authors: [{ name: 'Z-Learn' }],
+  creator: 'Z-Learn',
+  openGraph: {
+    title: 'Z-Learn | AI-Powered Learning',
+    description: 'Transform your skills with AI-driven personalized education',
+    type: 'website',
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn(
+        "min-h-screen bg-background antialiased",
+        "font-source-sans", // Source Sans as default body font
+        "container mx-auto border shadow",
+        poppins.variable,
+        sourceSans.variable
+      )}>
+        <Header />
+        <main className="flex-1">
+          {children}
+          <AIAssistant />
+        </main>
+        <Footer />
+        <Toaster richColors />
+      </body>
+    </html>
+  );
+}
