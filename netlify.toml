@@ -1,6 +1,5 @@
 [build]
   command = "npm run build"
-  publish = ".next/static"
 
 [build.environment]
   NODE_VERSION = "18"
