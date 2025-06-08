@@ -2,7 +2,7 @@ import { AuthButtons } from "../auth-buttons";
 import { NavigationLinks } from "../ui/navigation-links";
 
 interface DesktopNavigationProps {
-  items: any[]; // Replace 'any[]' with the appropriate type for 'items' if known
+  items: string[]; // Replace 'any[]' with the appropriate type for 'items' if known
 }
 
 export const DesktopNavigation = ({ items }: DesktopNavigationProps) => (

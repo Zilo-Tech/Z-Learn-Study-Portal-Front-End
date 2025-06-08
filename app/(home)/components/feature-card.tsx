@@ -33,7 +33,7 @@ export const FeatureCard = ({ image, title, description, ctaText = "Learn more" 
         <div className="mt-auto">
           <a 
             href="#"
-            className="inline-flex items-center text-blue-600 font-medium group"
+            className="inline-flex items-center text-brand font-medium group"
             aria-label={`Learn more about ${title}`}
           >
             {ctaText}

@@ -4,7 +4,7 @@ export const NavigationLinks = ({ items = ['Home', 'Courses', 'Instructors', 'Pr
       {items.map((item) => (
         <a
           key={item}
-          className="text-[#0d141c] text-sm font-medium leading-normal hover:text-[#0c77f2] font-semibold"
+          className="text-[#0d141c] text-sm  leading-normal hover:text-brand font-semibold"
           href="#"
         >
           {item}

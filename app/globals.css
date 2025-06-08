@@ -1,7 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+
+
+@theme{
+  --color-brand: #0c77f2;
+  --color-secondary: #002424;
+  --color-darkHover: #2a004a;
+  --color-darkTheme: #11001F;
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -118,9 +127,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Quicksand', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
-
 
 @media (max-width: 640px) {
   html {
@@ -180,4 +189,3 @@
     font-size: 15px !important;
   }
 }
-  

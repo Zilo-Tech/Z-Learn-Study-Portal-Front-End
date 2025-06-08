@@ -19,26 +19,25 @@ const HeroSection = () => {
   };
 
   return (
-    <div className="relative flex justify-center items-center min-h-[80vh] overflow-hidden">
+    <div className="relative flex justify-center items-center min-h-[90vh] overflow-hidden">
       {/* Video background with real educational content */}
       <div className="absolute inset-0 z-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover"
-          poster="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
-        >
-          {/* Using a real educational/tech video from Pixabay */}
-          <source src="https://cdn.pixabay.com/video/2022/12/11/142834-778693311_large.mp4" type="video/mp4" />
-          {/* Fallback video from another CDN */}
-          <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1c9a91a6d&profile_id=139&oauth2_token_id=57447761" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+      <video
+  ref={videoRef}
+  muted
+  autoPlay={true}
+  playsInline
+  loop
+  className="w-full h-full object-cover"
+  poster="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+>
+  {/* Sample educational/technology videos */}
+  <source src="https://sample-videos.com/zip/10/mp4/720/SampleVideo_1280x720_1mb.mp4" type="video/mp4" />
+  <source src="https://file-examples.com/storage/fe86c8b1d4d131b19c5a2d8/2017/10/file_example_MP4_480_1_5MG.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-blue-900/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-brand/50"></div>
       </div>
 
       {/* Play/Pause Button - Top Right Corner */}
@@ -72,7 +71,7 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Transform Your Skills with <span className="text-blue-400">AI-Driven</span> Learning
+            Transform Your Skills with <span className="text-brand">AI-Driven</span> Learning
           </motion.h1>
           
           <motion.p 
@@ -91,7 +90,7 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
             <motion.button 
-              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all duration-300"
+              className="px-8 py-3 bg-brand hover:bg-brand/00 text-white font-medium rounded-lg transition-all duration-300"
               whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(59, 130, 246, 0.3)" }}
               whileTap={{ scale: 0.95 }}
             >
@@ -107,18 +106,7 @@ const HeroSection = () => {
           </motion.div>
         </motion.div>
 
-        {/* Video Info Badge */}
-        <motion.div
-          className="absolute bottom-6 left-6 bg-black/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg border border-white/20"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 1 }}
-        >
-          <div className="flex items-center gap-2 text-sm">
-            <div className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-red-500' : 'bg-gray-400'}`}></div>
-            <span>{isPlaying ? 'Playing' : 'Paused'}</span>
-          </div>
-        </motion.div>
+      
       </div>
     </div>
   );
