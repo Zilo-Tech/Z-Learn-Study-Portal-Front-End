@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface FeatureCardProps {
   image: string;
@@ -12,11 +13,11 @@ export const FeatureCard = ({ image, title, description, ctaText = "Learn more" 
     <div className="flex flex-col h-full bg-white rounded-lg  border border-gray-200 overflow-hidden  transition-all duration-300">
       {/* Image container with Cisco-style aspect ratio */}
       <div className="relative pt-[56.25%] overflow-hidden">
-        <img
+        <Image
           src={image}
           alt={title}
+          fill
           className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-          loading="lazy"
         />
       </div>
       
