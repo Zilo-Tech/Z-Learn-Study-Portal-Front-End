@@ -3,7 +3,6 @@ import '../globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 import { AIAssistant } from './components/ai/assistant';
-import Header from '@/components/ui/header';
 import Footer from '@/components/footer';
 
 // Poppins - Used by Coursera, Udemy, and many modern learning platforms

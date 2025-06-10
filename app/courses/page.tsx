@@ -155,19 +155,7 @@ export default function CoursesGrid() {
   const [selectedPrice, setSelectedPrice] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
 
-  const tips = [
-    "Learn cybersecurity fundamentals.",
-    "Explore AI and machine learning.",
-    "Master cloud architecture."
-  ];
-  const [currentTip, setCurrentTip] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTip((prev) => (prev + 1) % tips.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Filter and sort courses
   useEffect(() => {

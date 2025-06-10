@@ -14,14 +14,14 @@ export const CallToAction = () => {
                     </h1>
                     <p className="text-[#0d141c] text-base font-normal leading-normal max-w-[720px] mx-auto">
                         Join thousands of learners who are achieving their goals with Z-Learn.
-                    </p>
+                    </p>                        
                 </div>
 
                 <div className="flex flex-1 justify-center">
                     <div className="flex justify-center">
                         <button
                             onClick={() => router.push('/level-selection')}
-                            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-brand text-slate-50 text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] grow"
+                            className="flex min-w-[84px] max-w-[480px] cursor-point         er items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-brand text-slate-50 text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] grow"
                         >
                             <span className="truncate">Start Learning Today</span>
                         </button>
