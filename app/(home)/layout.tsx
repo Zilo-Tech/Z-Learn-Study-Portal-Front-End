@@ -38,7 +38,6 @@ export default function HomeLayout({
         "container mx-auto border shadow",
         
       )}>
-        <Header />
         <main className="flex-1">
           {children}
           <AIAssistant />

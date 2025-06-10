@@ -5,8 +5,86 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
+const courses = {
+  cybershield: {
+      title: 'CyberShield',
+      description: 'Master cybersecurity fundamentals and protect against digital threats',
+      icon: '🛡️',
+      levels: [
+          {
+              id: 'beginner',
+              title: 'Beginner',
+              description: 'Perfect for those new to cybersecurity. Learn the fundamentals and build a strong foundation.',
+              icon: '🔰'
+          },
+          {
+              id: 'intermediate',
+              title: 'Intermediate',
+              description: 'For those with basic knowledge. Deepen your understanding and practical skills.',
+              icon: '⚡'
+          },
+          {
+              id: 'advanced',
+              title: 'Advanced',
+              description: 'For experienced professionals. Master complex concepts and advanced techniques.',
+              icon: '🚀'
+          }
+      ]
+  },
+  'ai-mastery': {
+      title: 'AI Mastery',
+      description: 'Learn artificial intelligence and machine learning from the ground up',
+      icon: '🤖',
+      levels: [
+          {
+              id: 'beginner',
+              title: 'Beginner',
+              description: 'Start your AI journey with fundamental concepts and basic implementations.',
+              icon: '🎯'
+          },
+          {
+              id: 'intermediate',
+              title: 'Intermediate',
+              description: 'Dive deeper into machine learning algorithms and neural networks.',
+              icon: '🧠'
+          },
+          {
+              id: 'advanced',
+              title: 'Advanced',
+              description: 'Master advanced AI concepts and build complex models.',
+              icon: '⚡'
+          }
+      ]
+  },
+  'cloud-architect': {
+      title: 'Cloud Architect',
+      description: 'Design and deploy scalable cloud solutions',
+      icon: '☁️',
+      levels: [
+          {
+              id: 'beginner',
+              title: 'Beginner',
+              description: 'Learn cloud fundamentals and basic deployment strategies.',
+          },
+          {
+              id: 'intermediate',
+              title: 'Intermediate',
+              description: 'Master cloud services and architecture patterns.',
+          },
+          {
+              id: 'advanced',
+              title: 'Advanced',
+              description: 'Design and implement complex cloud solutions.',
+              icon: '🌩️'
+          }
+      ]
+  }
+};
+
 export default function EducationLevelPage() {
   const [selectedLevel, setSelectedLevel] = useState<string>('');
+
+  
 
   const educationLevels = [
     { id: 'primary', label: 'Primary Education' },

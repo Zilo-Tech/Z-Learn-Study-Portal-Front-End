@@ -65,7 +65,7 @@ function CyberShieldCourseContent() {
     };
 
     const calculateScore = () => {
-        return answers.filter((answer, index) => 
+        return answers.filter((answer, index) =>
             answer === assessmentQuestions[index].correctAnswer
         ).length;
     };
@@ -73,36 +73,38 @@ function CyberShieldCourseContent() {
     if (showResults) {
         const score = calculateScore();
         return (
-            <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen mt-10 bg-gradient-to-b from-[#f4f8fb] to-white py-16 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-2xl mx-auto">
-                    <motion.div 
-                        className="bg-white rounded-xl shadow-lg p-8 text-center"
-                        initial={{ opacity: 0, scale: 0.9 }}
+                    <motion.div
+                        className="bg-white border border-[#d6e2eb] rounded-2xl  p-10 text-center"
+                        initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h2 className="text-3xl font-bold text-[#0d141c] mb-6">Assessment Complete!</h2>
-                        <p className="text-xl text-[#49709c] mb-8">
-                            You scored {score} out of {assessmentQuestions.length}
+                        <h2 className="text-4xl font-semibold text-[#003b5c] mb-6 tracking-tight">
+                            Assessment Complete!
+                        </h2>
+                        <p className="text-lg text-[#4a6c8c] mb-10">
+                            You scored <span className="font-bold text-brand">{score}</span> out of <span className="font-bold text-brand">{assessmentQuestions.length}</span>
                         </p>
                         <motion.button
-                            whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => router.push(`/course/cybershield/module/1?level=${level}`)}
-                            className="bg-[#0c77f2] text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-[#0c77f2]/90 transition-colors"
+                            className="bg-brand hover:bg-brand/90 text-white px-10 py-4 rounded-xl text-lg font-medium "
                         >
                             Start Learning
                         </motion.button>
                     </motion.div>
                 </div>
             </div>
+
         );
     }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
-                <motion.div 
+                <motion.div
                     className="text-center mb-12"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -112,8 +114,8 @@ function CyberShieldCourseContent() {
                     <p className="text-[#49709c] text-xl">Let&apos;s assess your current knowledge level</p>
                 </motion.div>
 
-                <motion.div 
-                    className="bg-white rounded-xl shadow-lg p-8"
+                <motion.div
+                    className="bg-white rounded-xl  p-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
@@ -124,7 +126,7 @@ function CyberShieldCourseContent() {
                                 Question {currentQuestion + 1} of {assessmentQuestions.length}
                             </span>
                             <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <motion.div 
+                                <motion.div
                                     className="h-full bg-[#0c77f2]"
                                     initial={{ width: 0 }}
                                     animate={{ width: `${((currentQuestion + 1) / assessmentQuestions.length) * 100}%` }}
