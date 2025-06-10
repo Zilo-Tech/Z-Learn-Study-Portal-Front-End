@@ -127,7 +127,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Quicksand', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 500;
   }
 }
 
