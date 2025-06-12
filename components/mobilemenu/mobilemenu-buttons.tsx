@@ -3,7 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AuthButtons } from '../auth-buttons';
 
 // Mobile Menu Component
-export const MobileMenu = ({ isOpen, items = ['Home', 'Courses', 'Instructors', 'Pricing'] }: { isOpen: boolean; items?: string[] }) => {
+export const MobileMenu = ({ isOpen, items = [
+  { label: 'Home', href: '/' },
+  { label: 'Courses', href: '/courses' },
+  { label: 'Enrollments', href: '/enrollments' },
+  { label: 'Study Sessions', href: '/study-sessions/demo' },
+  { label: 'Achievements', href: '/achievements' },
+  { label: 'Messages', href: '/messages' },
+  { label: 'Admin Outline', href: '/admin/courses/1/outline' },
+  { label: 'Analytics', href: '/admin/analytics' }
+] }: { isOpen: boolean; items?: { label: string; href: string }[] }) => {
     const menuVariants = {
         hidden: {
             opacity: 0,
@@ -55,8 +64,8 @@ export const MobileMenu = ({ isOpen, items = ['Home', 'Courses', 'Instructors', 
                     <div className="px-4 pt-2 pb-4 space-y-1 sm:px-6 bg-white">
                         {items.map((item, index) => (
                             <motion.a
-                                key={item}
-                                href=""
+                                key={item.label}
+                                href={item.href}
                                 className="block px-3 py-2 rounded-md text-base font-medium text-[#0d141c] hover:bg-gray-50"
                                 variants={menuItemVariants}
                                 initial="hidden"
@@ -65,7 +74,7 @@ export const MobileMenu = ({ isOpen, items = ['Home', 'Courses', 'Instructors', 
                                 custom={index}
                                 whileHover={{ x: 5 }}
                             >
-                                {item}
+                                {item.label}
                             </motion.a>
                         ))}
                         <motion.div

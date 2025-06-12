@@ -9,7 +9,16 @@ import { usePathname } from 'next/navigation';
 
 const Header = () => {
   const pathname = usePathname();
-  const navigationItems = ['Home', 'Courses', 'Instructors', 'Pricing'];
+  const navigationItems = [
+    { label: 'Home', href: '/' },
+    { label: 'Courses', href: '/courses' },
+    { label: 'Enrollments', href: '/enrollments' },
+    { label: 'Study Sessions', href: '/study-sessions/demo' },
+    { label: 'Achievements', href: '/achievements' },
+    { label: 'Messages', href: '/messages' },
+    { label: 'Admin Outline', href: '/admin/courses/1/outline' },
+    { label: 'Analytics', href: '/admin/analytics' }
+  ];
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -27,8 +36,6 @@ const Header = () => {
       document.body.style.overflow = '';
     };
   }, [isMenuOpen]);
-
- 
 
   return (
     <header className={`${pathname === "/" && "sticky top-0"} w-full z-50 bg-white border-b`}>
