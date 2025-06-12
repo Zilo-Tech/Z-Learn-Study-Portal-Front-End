@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 import { AIAssistant } from './components/ai/assistant';
 import Footer from '@/components/footer';
+import Header from '@/components/ui/header';
 
 // Poppins - Used by Coursera, Udemy, and many modern learning platforms
 
@@ -37,6 +38,7 @@ export default function HomeLayout({
         "container mx-auto border shadow",
         
       )}>
+        <Header />
         <main className="flex-1">
           {children}
           <AIAssistant />

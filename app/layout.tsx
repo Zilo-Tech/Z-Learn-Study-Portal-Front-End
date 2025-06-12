@@ -6,7 +6,6 @@ export default function COurseLayout({ children }: { children: ReactNode }) {
   return (
     <html>
       <body>
-        <Header />
         {children}
       </body>
     </html>
