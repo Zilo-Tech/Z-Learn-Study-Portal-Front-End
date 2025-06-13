@@ -42,7 +42,7 @@ export default function SignUpPage() {
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2">
             <div className="text-lg">
-              "Z-Learn has transformed how I approach learning. The personalized AI-powered courses and interactive features make learning engaging and effective."
+              &quot;CyberShield has transformed how we handle our cybersecurity training. The platform is intuitive, comprehensive, and truly effective.&quot;
             </div>
             <footer className="text-sm">Sofia Davis</footer>
           </blockquote>
