@@ -13,21 +13,23 @@ export default function SignUpPage() {
   }, []);
 
   return (
-    <div className="container relative flex min-h-screen flex-col justify-center sm:items-center md:grid lg:max-w-none lg:grid-cols-2 px-4 lg:px-0">
+    <div className="container relative flex min-h-screen flex-col justify-center sm:items-center md:grid lg:max-w-none lg:grid-cols-2 px-4 lg:px-0 mx-auto">
       {/* Video Background Section */}
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white md:flex dark:border-r overflow-hidden">
+    
+      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r overflow-hidden">
         <video
           ref={videoRef}
           loop
           muted
           playsInline
           className="absolute inset-0 object-cover w-full h-full"
+
           poster="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
         >
-          {/* Using a reliable educational video from a CDN */}
+          {/* Using a real educational/tech video from Pixabay */}
+          <source src="https://cdn.pixabay.com/video/2022/12/11/142834-778693311_large.mp4" type="video/mp4" />
+          {/* Fallback video from another CDN */}
           <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1c9a91a6d&profile_id=139&oauth2_token_id=57447761" type="video/mp4" />
-          {/* Fallback video */}
-          <source src="https://player.vimeo.com/external/371433846.sd.mp4?s=236da2f3c0fd273d2c6d9a064f3ae35579b2bbdf&profile_id=139&oauth2_token_id=57447761" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
 
@@ -40,20 +42,21 @@ export default function SignUpPage() {
         </div>
 
         <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2">
-            <div className="text-lg">
+          <blockquote className="space-y-2 backdrop-blur-sm bg-black/30 p-6 rounded-lg">
+          
+          <div className="text-lg">
               &quot;CyberShield has transformed how we handle our cybersecurity training. The platform is intuitive, comprehensive, and truly effective.&quot;
             </div>
-            <footer className="text-sm">Sofia Davis</footer>
+            <footer className="text-sm">Michael Chen</footer>
           </blockquote>
         </div>
       </div>
 
       {/* Auth Form Section */}
-      <div className="lg:p-8">
+      <div className="lg:p-8 w-full">
         
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
-          <AuthForm type="signup" />
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
+      <AuthForm type="signup" />
         </div>
       </div>
     </div>
