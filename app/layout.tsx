@@ -1,12 +1,20 @@
 import "@/app/globals.css";
 import Header from "@/components/ui/header";
 import { ReactNode } from "react";
+import { Inter } from 'next/font/google';
+import { Providers } from './providers';
 
-export default function COurseLayout({ children }: { children: ReactNode }) {
+const inter = Inter({ subsets: ['latin'] });
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html>
-      <body>
-        {children}
+    <html lang="en">
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

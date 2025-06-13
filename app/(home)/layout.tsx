@@ -35,7 +35,7 @@ export default function HomeLayout({
       <div className={cn(
         "min-h-screen bg-background antialiased",
         "font-source-sans", // Source Sans as default body font
-        "container mx-auto border shadow",
+        "container mx-auto",
         
       )}>
         <Header />

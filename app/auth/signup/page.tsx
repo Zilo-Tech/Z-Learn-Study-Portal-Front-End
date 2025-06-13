@@ -22,13 +22,12 @@ export default function SignUpPage() {
           muted
           playsInline
           className="absolute inset-0 object-cover w-full h-full"
-
           poster="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
         >
-          {/* Using a real educational/tech video from Pixabay */}
-          <source src="https://cdn.pixabay.com/video/2022/12/11/142834-778693311_large.mp4" type="video/mp4" />
-          {/* Fallback video from another CDN */}
+          {/* Using a reliable educational video from a CDN */}
           <source src="https://player.vimeo.com/external/434045526.sd.mp4?s=c27eecc69a27dbc4ff2b87d38afc35f1c9a91a6d&profile_id=139&oauth2_token_id=57447761" type="video/mp4" />
+          {/* Fallback video */}
+          <source src="https://player.vimeo.com/external/371433846.sd.mp4?s=236da2f3c0fd273d2c6d9a064f3ae35579b2bbdf&profile_id=139&oauth2_token_id=57447761" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
 
@@ -41,14 +40,11 @@ export default function SignUpPage() {
         </div>
 
         <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2 backdrop-blur-sm bg-black/30 p-6 rounded-lg">
-            <p className="text-lg">
-              <p className="text-lg">
-                &quot;I went from beginner to job-ready in 3 months with Z-Learn&apos;s personalized learning paths.&quot;
-              </p>
-
-            </p>
-            <footer className="text-sm">Michael Chen</footer>
+          <blockquote className="space-y-2">
+            <div className="text-lg">
+              "Z-Learn has transformed how I approach learning. The personalized AI-powered courses and interactive features make learning engaging and effective."
+            </div>
+            <footer className="text-sm">Sofia Davis</footer>
           </blockquote>
         </div>
       </div>
