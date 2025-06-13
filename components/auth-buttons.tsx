@@ -22,7 +22,7 @@ export const AuthButtons = ({ variant = "desktop" }) => {
             : "flex-1 py-2 rounded-md"
         } bg-brand text-white text-sm font-bold hover:bg-brand/80 transition-colors text-center`}
       >
-        <Link href="/auth/signup">Sign u</Link>
+        <Link href="/auth/signup">Sign up</Link>
       </motion.div>
       <motion.div
         whileHover={{ scale: 1.02 }}
@@ -33,7 +33,7 @@ export const AuthButtons = ({ variant = "desktop" }) => {
             : "flex-1 py-2 rounded-md"
         } bg-[#e7edf4] text-[#0d141c] text-sm font-bold hover:bg-[#d9e0e8] transition-colors text-center`}
       >
-        <Link href="/auth/signin">Log n</Link>
+        <Link href="/auth/signin">Log in</Link>
       </motion.div>
     </div>
   );
