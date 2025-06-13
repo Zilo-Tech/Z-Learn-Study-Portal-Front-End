@@ -148,7 +148,7 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                     </div>
                 )}
 
-                <Button disabled={isLoading}>
+                <Button variant={'brand'} className='w-full' disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {type === "signin" ? "Sign In" : "Sign Up"}
                 </Button>
