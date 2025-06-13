@@ -3,180 +3,51 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Mail, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Logo } from '@/components/ui/logo';
 import { signIn } from 'next-auth/react';
 import { register } from '@/app/services/auth';
 
 export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
-    const [formData, setFormData] = useState<{
-        email: string;
-        password: string;
-        full_name?: string;
-        confirmPassword?: string;
-    }>({
-        email: '',
-        password: '',
-        ...(type === 'signup' && {
-            full_name: '',
-            confirmPassword: ''
-        })
-    });
-
-    const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const validate = () => {
-        const newErrors: Record<string, string> = {};
-
-        if (!formData.email) newErrors.email = "Email is required";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = "Please enter a valid email";
-        }
-
-        if (!formData.password) newErrors.password = "Password is required";
-        else if (formData.password.length < 6) {
-            newErrors.password = "Password must be at least 6 characters";
-        }
-
-        if (type === 'signup') {
-            if (!formData.full_name) newErrors.full_name = "Full name is required";
-            if (!formData.confirmPassword) {
-                newErrors.confirmPassword = "Please confirm your password";
-            } else if (formData.password !== formData.confirmPassword) {
-                newErrors.confirmPassword = "Passwords don't match";
-            }
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!validate()) return;
-
         setIsLoading(true);
-        setErrors({});
+        setError(null);
+
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
 
         try {
-            if (type === 'signup') {
-                console.log('Attempting registration with:', {
-                    email: formData.email,
-                    full_name: formData.full_name,
-                    password: formData.password // Log actual password for debugging
+            if (type === "signin") {
+                const result = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
                 });
-
-                const response = await register({
-                    full_name: formData.full_name || '',
-                    email: formData.email,
-                    password: formData.password,
-                    confirm_password: formData.confirmPassword || ''
-                });
-                
-                if (response.message) {
-                    console.log('Registration successful, attempting auto-login');
-                    // Automatically sign in after successful registration
-                    const result = await signIn('credentials', {
-                        email: formData.email,
-                        password: formData.password,
-                        redirect: false
-                    });
-
-                    if (result?.error) {
-                        console.error('Auto-login error:', result.error);
-                        setErrors({ general: 'Registration successful, but automatic login failed. Please try logging in manually.' });
-                    } else if (result?.ok) {
-                        window.location.href = '/';
-                    }
-                }
-            } else {
-                // Format the credentials
-                const credentials = {
-                    email: formData.email.trim(),
-                    password: formData.password
-                };
-
-                console.log('Submitting login form with:', {
-                    email: credentials.email,
-                    password: credentials.password // Log actual password for debugging
-                });
-
-                const result = await signIn('credentials', {
-                    ...credentials,
-                    redirect: false
-                });
-
-                console.log('Sign in result:', result);
 
                 if (result?.error) {
-                    console.error('Sign in error:', result.error);
-                    let errorMessage = result.error;
-                    if (errorMessage === 'CredentialsSignin') {
-                        errorMessage = 'Invalid email or password';
-                    } else if (errorMessage.includes('No user with this email')) {
-                        errorMessage = 'No account found with this email address';
-                    }
-                    setErrors({ general: errorMessage });
-                } else if (result?.ok) {
-                    window.location.href = '/';
-                }
-            }
-        } catch (error) {
-            console.error("Authentication error:", error);
-            
-            if (error instanceof Error) {
-                try {
-                    // Try to parse the error message as JSON for validation errors
-                    const validationErrors = JSON.parse(error.message);
-                    if (typeof validationErrors === 'object') {
-                        // Set field-specific errors
-                        Object.entries(validationErrors).forEach(([field, messages]) => {
-                            if (Array.isArray(messages) && messages.length > 0) {
-                                setErrors(prev => ({
-                                    ...prev,
-                                    [field]: messages[0] // Take the first error message for each field
-                                }));
-                            }
-                        });
-                        return;
-                    }
-                } catch {
-                    // If parsing fails, handle as a regular error message
-                    const errorMessage = error.message.toLowerCase();
-                    
-                    if (errorMessage.includes('network') || errorMessage.includes('timeout')) {
-                        setErrors({ general: 'Network error. Please check your connection.' });
-                    } else if (errorMessage.includes('email already exists')) {
-                        setErrors({ email: 'This email is already registered' });
-                    } else if (errorMessage.includes('invalid credentials')) {
-                        setErrors({ general: 'Invalid email or password' });
-                    } else if (errorMessage.includes('password')) {
-                        setErrors({ password: 'Password must be at least 6 characters' });
-                    } else if (errorMessage.includes('confirm')) {
-                        setErrors({ confirmPassword: 'Passwords do not match' });
-                    } else {
-                        setErrors({ general: error.message });
-                    }
+                    setError(result.error);
                 }
             } else {
-                setErrors({ general: 'An unexpected error occurred' });
+                const name = formData.get("name") as string;
+                await register({ name, email, password });
+                // After successful registration, sign in the user
+                await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                });
             }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Something went wrong");
         } finally {
             setIsLoading(false);
         }
@@ -206,60 +77,51 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
             <form onSubmit={handleSubmit} className="space-y-6 border rounded-lg p-4 sm:p-4 lg:p-6">
                 {type === 'signup' && (
                     <div className="space-y-2">
-                        <Label htmlFor="full_name">Full Name</Label>
+                        <Label htmlFor="name">Name</Label>
                         <div className="relative">
+                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input
-                                id="full_name"
-                                name="full_name"
-                                type="text"
-                                value={formData.full_name}
-                                onChange={handleChange}
+                                id="name"
+                                name="name"
                                 placeholder="John Doe"
-                                className={errors.full_name ? 'border-destructive' : ''}
+                                type="text"
+                                autoCapitalize="none"
+                                autoComplete="name"
+                                autoCorrect="off"
+                                disabled={isLoading}
+                                className="pl-9"
+                                required
                             />
-                            <User className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         </div>
-                        {errors.full_name && (
-                            <p className="text-sm text-destructive">{errors.full_name}</p>
-                        )}
                     </div>
                 )}
 
                 <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email">Email</Label>
                     <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                             id="email"
                             name="email"
+                            placeholder="name@example.com"
                             type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="you@example.com"
-                            className={errors.email ? 'border-destructive' : ''}
+                            autoCapitalize="none"
+                            autoComplete="email"
+                            autoCorrect="off"
+                            disabled={isLoading}
+                            className="pl-9"
+                            required
                         />
-                        <Mail className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     </div>
-                    {errors.email && (
-                        <p className="text-sm text-destructive">{errors.email}</p>
-                    )}
                 </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
                     <div className="relative">
-                        <Input
-                            id="password"
-                            name="password"
-                            type={showPassword ? "text" : "password"}
-                            value={formData.password}
-                            onChange={handleChange}
-                            placeholder="••••••••"
-                            className={errors.password ? 'border-destructive' : ''}
-                        />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            className="absolute right-3 top-3 text-muted-foreground"
                         >
                             {showPassword ? (
                                 <EyeOff className="h-4 w-4" />
@@ -267,75 +129,28 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                                 <Eye className="h-4 w-4" />
                             )}
                         </button>
+                        <Input
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            type={showPassword ? "text" : "password"}
+                            autoCapitalize="none"
+                            autoComplete="current-password"
+                            disabled={isLoading}
+                            required
+                        />
                     </div>
-                    {errors.password && (
-                        <p className="text-sm text-destructive">{errors.password}</p>
-                    )}
                 </div>
 
-                {type === 'signup' && (
-                    <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirm Password</Label>
-                        <div className="relative">
-                            <Input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type={showConfirmPassword ? "text" : "password"}
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                placeholder="••••••••"
-                                className={errors.confirmPassword ? 'border-destructive' : ''}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                            >
-                                {showConfirmPassword ? (
-                                    <EyeOff className="h-4 w-4" />
-                                ) : (
-                                    <Eye className="h-4 w-4" />
-                                )}
-                            </button>
-                        </div>
-                        {errors.confirmPassword && (
-                            <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-                        )}
+                {error && (
+                    <div className="text-sm text-red-500">
+                        {error}
                     </div>
                 )}
 
-                {type === 'signin' && (
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="rememberMe"
-                                checked={rememberMe}
-                                onCheckedChange={(checked) => setRememberMe(checked === true)}
-                            />
-                            <Label htmlFor="rememberMe">Remember me</Label>
-                        </div>
-                        <Link
-                            href="/forgot-password"
-                            className="text-sm font-medium text-primary hover:underline"
-                        >
-                            Forgot password?
-                        </Link>
-                    </div>
-                )}
-
-                {errors.general && (
-                    <p className="text-sm text-destructive text-center">{errors.general}</p>
-                )}
-
-                <Button variant={'brand'} type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                        <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Please wait...
-                        </>
-                    ) : (
-                        type === 'signin' ? 'Sign In' : 'Create Account'
-                    )}
+                <Button disabled={isLoading}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {type === "signin" ? "Sign In" : "Sign Up"}
                 </Button>
             </form>
 
