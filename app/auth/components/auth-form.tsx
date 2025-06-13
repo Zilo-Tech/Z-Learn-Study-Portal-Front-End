@@ -14,6 +14,7 @@ import { register } from '@/app/services/auth';
 export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,6 +39,14 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                 }
             } else {
                 const name = formData.get("name") as string;
+                const confirmPassword = formData.get("confirm_password") as string;
+
+                if (password !== confirmPassword) {
+                    setError("Passwords do not match");
+                    setIsLoading(false);
+                    return;
+                }
+
                 await register({ name, email, password });
                 // After successful registration, sign in the user
                 await signIn("credentials", {
@@ -61,11 +70,11 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
             className="w-full mx-auto px-2"
         >
             <div className="text-center">
-                <div className="relative z-20 flex items-center justify-center text-lg font-medium mb-5 sm:hidden">
-                    <Logo size='dxl' />
+                <div className="relative z-20 flex items-center justify-center  font-medium mb-5 lg:hidden">
+                    <Logo size='lg' />
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight mb-5">
-                    {type === 'signin' ? 'Welcome back' : 'Create an account'}
+                    {type === 'signin' ? 'Welcome bacK' : 'Create an account'}
                 </h1>
                 <p className="mt-2 text-sm text-muted-foreground my-8">
                     {type === 'signin'
@@ -135,12 +144,41 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                             placeholder="••••••••"
                             type={showPassword ? "text" : "password"}
                             autoCapitalize="none"
-                            autoComplete="current-password"
+                            autoComplete="new-password"
                             disabled={isLoading}
                             required
                         />
                     </div>
                 </div>
+
+                {type === 'signup' && (
+                    <div className="space-y-2">
+                        <Label htmlFor="confirm_password">Confirm Password</Label>
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-3 text-muted-foreground"
+                            >
+                                {showConfirmPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
+                            <Input
+                                id="confirm_password"
+                                name="confirm_password"
+                                placeholder="••••••••"
+                                type={showConfirmPassword ? "text" : "password"}
+                                autoCapitalize="none"
+                                autoComplete="new-password"
+                                disabled={isLoading}
+                                required
+                            />
+                        </div>
+                    </div>
+                )}
 
                 {error && (
                     <div className="text-sm text-red-500">

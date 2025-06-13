@@ -15,7 +15,7 @@ export default function SignUpPage() {
   return (
     <div className="container relative flex min-h-screen flex-col justify-center sm:items-center md:grid lg:max-w-none lg:grid-cols-2 px-4 lg:px-0">
       {/* Video Background Section */}
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r overflow-hidden">
+      <div className="relative hidden h-full flex-col bg-muted p-10 text-white md:flex dark:border-r overflow-hidden">
         <video
           ref={videoRef}
           loop
@@ -51,6 +51,7 @@ export default function SignUpPage() {
 
       {/* Auth Form Section */}
       <div className="lg:p-8">
+        
         <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
           <AuthForm type="signup" />
         </div>
