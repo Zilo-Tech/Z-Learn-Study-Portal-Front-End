@@ -6,10 +6,19 @@ import { DesktopNavigation } from '../desktopnav';
 import { MobileMenuButton } from '../mobilemenu';
 import { MobileMenu } from '../mobilemenu/mobilemenu-buttons';
 import { usePathname } from 'next/navigation';
+import { UserMenu } from '../user-menu';
+import { AuthButtons } from '../auth-buttons';
+import { Bars3Icon } from '@heroicons/react/24/outline';
+
+const navigationItems = [
+  { name: 'Home', href: '/' },
+  { name: 'Courses', href: '/courses' },
+  { name: 'Instructors', href: '/instructors' },
+  { name: 'Pricing', href: '/pricing' }
+];
 
 const Header = () => {
   const pathname = usePathname();
-  const navigationItems = ['Home', 'Courses', 'Instructors', 'Pricing'];
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -28,18 +37,24 @@ const Header = () => {
     };
   }, [isMenuOpen]);
 
- 
-
   return (
-    <header className={`${pathname === "/" && "sticky top-0"} w-full z-50 bg-white border-b`}>
+    <header className={`${pathname === "/" ? "sticky top-0" : ""} w-full z-50 bg-white border-b`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 py-4">
           <Logo />
-          <DesktopNavigation items={navigationItems} />
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <DesktopNavigation items={navigationItems} />
+            <UserMenu />
+          </div>
+
+          {/* Mobile Menu Button */}
           <MobileMenuButton isMenuOpen={isMenuOpen} onToggle={toggleMenu} />
         </div>
       </div>
 
+      {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div

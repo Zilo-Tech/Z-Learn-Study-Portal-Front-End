@@ -3,19 +3,26 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox'; // Ensure this file exists at the specified path or update the path to the correct location.
+import { Checkbox } from '@/components/ui/checkbox';
 import { Logo } from '@/components/ui/logo';
+import { signIn } from 'next-auth/react';
+import { register } from '@/app/services/auth';
 
 export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<{
+        email: string;
+        password: string;
+        full_name?: string;
+        confirmPassword?: string;
+    }>({
         email: '',
         password: '',
         ...(type === 'signup' && {
-            name: '',
+            full_name: '',
             confirmPassword: ''
         })
     });
@@ -23,6 +30,8 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [rememberMe, setRememberMe] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -46,11 +55,11 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
         }
 
         if (type === 'signup') {
-            if (!formData.name) newErrors.name = "Name is required";
+            if (!formData.full_name) newErrors.full_name = "Full name is required";
             if (!formData.confirmPassword) {
                 newErrors.confirmPassword = "Please confirm your password";
             } else if (formData.password !== formData.confirmPassword) {
-                newErrors.confirmPassword = "Passwords don\u2019t match";
+                newErrors.confirmPassword = "Passwords don't match";
             }
         }
 
@@ -63,13 +72,111 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
         if (!validate()) return;
 
         setIsLoading(true);
+        setErrors({});
+
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            alert(`${type === 'signin' ? "Signed in" : "Account created"} successfully!`);
+            if (type === 'signup') {
+                console.log('Attempting registration with:', {
+                    email: formData.email,
+                    full_name: formData.full_name,
+                    password: formData.password // Log actual password for debugging
+                });
+
+                const response = await register({
+                    full_name: formData.full_name || '',
+                    email: formData.email,
+                    password: formData.password,
+                    confirm_password: formData.confirmPassword || ''
+                });
+                
+                if (response.message) {
+                    console.log('Registration successful, attempting auto-login');
+                    // Automatically sign in after successful registration
+                    const result = await signIn('credentials', {
+                        email: formData.email,
+                        password: formData.password,
+                        redirect: false
+                    });
+
+                    if (result?.error) {
+                        console.error('Auto-login error:', result.error);
+                        setErrors({ general: 'Registration successful, but automatic login failed. Please try logging in manually.' });
+                    } else if (result?.ok) {
+                        window.location.href = '/';
+                    }
+                }
+            } else {
+                // Format the credentials
+                const credentials = {
+                    email: formData.email.trim(),
+                    password: formData.password
+                };
+
+                console.log('Submitting login form with:', {
+                    email: credentials.email,
+                    password: credentials.password // Log actual password for debugging
+                });
+
+                const result = await signIn('credentials', {
+                    ...credentials,
+                    redirect: false
+                });
+
+                console.log('Sign in result:', result);
+
+                if (result?.error) {
+                    console.error('Sign in error:', result.error);
+                    let errorMessage = result.error;
+                    if (errorMessage === 'CredentialsSignin') {
+                        errorMessage = 'Invalid email or password';
+                    } else if (errorMessage.includes('No user with this email')) {
+                        errorMessage = 'No account found with this email address';
+                    }
+                    setErrors({ general: errorMessage });
+                } else if (result?.ok) {
+                    window.location.href = '/';
+                }
+            }
         } catch (error) {
-            console.error("Error during authentication:", error);
-            setErrors({ general: "An error occurred. Please try again." });
+            console.error("Authentication error:", error);
+            
+            if (error instanceof Error) {
+                try {
+                    // Try to parse the error message as JSON for validation errors
+                    const validationErrors = JSON.parse(error.message);
+                    if (typeof validationErrors === 'object') {
+                        // Set field-specific errors
+                        Object.entries(validationErrors).forEach(([field, messages]) => {
+                            if (Array.isArray(messages) && messages.length > 0) {
+                                setErrors(prev => ({
+                                    ...prev,
+                                    [field]: messages[0] // Take the first error message for each field
+                                }));
+                            }
+                        });
+                        return;
+                    }
+                } catch {
+                    // If parsing fails, handle as a regular error message
+                    const errorMessage = error.message.toLowerCase();
+                    
+                    if (errorMessage.includes('network') || errorMessage.includes('timeout')) {
+                        setErrors({ general: 'Network error. Please check your connection.' });
+                    } else if (errorMessage.includes('email already exists')) {
+                        setErrors({ email: 'This email is already registered' });
+                    } else if (errorMessage.includes('invalid credentials')) {
+                        setErrors({ general: 'Invalid email or password' });
+                    } else if (errorMessage.includes('password')) {
+                        setErrors({ password: 'Password must be at least 6 characters' });
+                    } else if (errorMessage.includes('confirm')) {
+                        setErrors({ confirmPassword: 'Passwords do not match' });
+                    } else {
+                        setErrors({ general: error.message });
+                    }
+                }
+            } else {
+                setErrors({ general: 'An unexpected error occurred' });
+            }
         } finally {
             setIsLoading(false);
         }
@@ -80,11 +187,11 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full mx-auto px-2 "
+            className="w-full mx-auto px-2"
         >
             <div className="text-center">
                 <div className="relative z-20 flex items-center justify-center text-lg font-medium mb-5 sm:hidden">
-                    <Logo size='dxl'  />
+                    <Logo size='dxl' />
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight mb-5">
                     {type === 'signin' ? 'Welcome back' : 'Create an account'}
@@ -92,28 +199,28 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                 <p className="mt-2 text-sm text-muted-foreground my-8">
                     {type === 'signin'
                         ? 'Enter your credentials to access your dashboard'
-                        : 'Start your learning journey with Z-Learn'}
+                        : 'Start your learning journey with us'}
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6 border rounded-lg p-4 sm:p-4 lg:p-6" >
+            <form onSubmit={handleSubmit} className="space-y-6 border rounded-lg p-4 sm:p-4 lg:p-6">
                 {type === 'signup' && (
                     <div className="space-y-2">
-                        <Label htmlFor="name">Full Name</Label>
+                        <Label htmlFor="full_name">Full Name</Label>
                         <div className="relative">
                             <Input
-                                id="name"
-                                name="name"
+                                id="full_name"
+                                name="full_name"
                                 type="text"
-                                value={formData.name}
+                                value={formData.full_name}
                                 onChange={handleChange}
                                 placeholder="John Doe"
-                                className={errors.name ? 'border-destructive' : ''}
+                                className={errors.full_name ? 'border-destructive' : ''}
                             />
                             <User className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         </div>
-                        {errors.name && (
-                            <p className="text-sm text-destructive">{errors.name}</p>
+                        {errors.full_name && (
+                            <p className="text-sm text-destructive">{errors.full_name}</p>
                         )}
                     </div>
                 )}
@@ -143,13 +250,23 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                         <Input
                             id="password"
                             name="password"
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             value={formData.password}
                             onChange={handleChange}
                             placeholder="••••••••"
                             className={errors.password ? 'border-destructive' : ''}
                         />
-                        <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                            {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                            ) : (
+                                <Eye className="h-4 w-4" />
+                            )}
+                        </button>
                     </div>
                     {errors.password && (
                         <p className="text-sm text-destructive">{errors.password}</p>
@@ -163,13 +280,23 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                             <Input
                                 id="confirmPassword"
                                 name="confirmPassword"
-                                type="password"
+                                type={showConfirmPassword ? "text" : "password"}
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
                                 placeholder="••••••••"
                                 className={errors.confirmPassword ? 'border-destructive' : ''}
                             />
-                            <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            >
+                                {showConfirmPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
                         </div>
                         {errors.confirmPassword && (
                             <p className="text-sm text-destructive">{errors.confirmPassword}</p>
@@ -184,7 +311,6 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                                 id="rememberMe"
                                 checked={rememberMe}
                                 onCheckedChange={(checked) => setRememberMe(checked === true)}
-
                             />
                             <Label htmlFor="rememberMe">Remember me</Label>
                         </div>
@@ -195,6 +321,10 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                             Forgot password?
                         </Link>
                     </div>
+                )}
+
+                {errors.general && (
+                    <p className="text-sm text-destructive text-center">{errors.general}</p>
                 )}
 
                 <Button variant={'brand'} type="submit" className="w-full" disabled={isLoading}>
@@ -244,7 +374,7 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
             <p className="text-center text-sm text-muted-foreground mt-4">
                 {type === 'signin' ? (
                     <>
-                         Don&apos;t have an account?{' '}
+                        Don&apos;t have an account?{' '}
                         <Link
                             href="/auth/signup"
                             className="font-semibold text-primary hover:underline"

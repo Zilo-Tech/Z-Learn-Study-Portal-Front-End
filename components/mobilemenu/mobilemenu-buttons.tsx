@@ -1,9 +1,10 @@
 "use client";
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthButtons } from '../auth-buttons';
+import { NavigationItem } from '@/types/navigation';
 
 // Mobile Menu Component
-export const MobileMenu = ({ isOpen, items = ['Home', 'Courses', 'Instructors', 'Pricing'] }: { isOpen: boolean; items?: string[] }) => {
+export const MobileMenu = ({ isOpen, items = [] }: { isOpen: boolean; items?: NavigationItem[] }) => {
     const menuVariants = {
         hidden: {
             opacity: 0,
@@ -55,8 +56,8 @@ export const MobileMenu = ({ isOpen, items = ['Home', 'Courses', 'Instructors', 
                     <div className="px-4 pt-2 pb-4 space-y-1 sm:px-6 bg-white">
                         {items.map((item, index) => (
                             <motion.a
-                                key={item}
-                                href=""
+                                key={item.name}
+                                href={item.href}
                                 className="block px-3 py-2 rounded-md text-base font-medium text-[#0d141c] hover:bg-gray-50"
                                 variants={menuItemVariants}
                                 initial="hidden"
@@ -65,7 +66,7 @@ export const MobileMenu = ({ isOpen, items = ['Home', 'Courses', 'Instructors', 
                                 custom={index}
                                 whileHover={{ x: 5 }}
                             >
-                                {item}
+                                {item.name}
                             </motion.a>
                         ))}
                         <motion.div
