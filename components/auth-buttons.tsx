@@ -1,10 +1,15 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
-
-
+import { useSession } from "next-auth/react";
 
 export const AuthButtons = ({ variant = "desktop" }) => {
   const isDesktop = variant === "desktop";
+  const { data: session } = useSession();
+
+  // Don't render anything if user is logged in
+  if (session) {
+    return null;
+  }
 
   return (
     <div className="flex space-x-4">

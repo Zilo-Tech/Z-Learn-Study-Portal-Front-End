@@ -1,13 +1,15 @@
 import { AuthButtons } from "../auth-buttons";
 import { NavigationLinks } from "../ui/navigation-links";
+import { NavigationItem } from '@/types/navigation';
 
 interface DesktopNavigationProps {
-  items?: { label: string; href: string }[];
+  items: NavigationItem[];
 }
 
 export const DesktopNavigation = ({ items }: DesktopNavigationProps) => (
-  <div className="hidden md:flex flex-1 justify-end gap-8">
-    <NavigationLinks items={items} />
-    <AuthButtons variant="desktop" />
-  </div>
-);
+    <div className="hidden md:flex flex-1 justify-end gap-8">
+      <NavigationLinks items={items} />
+      <AuthButtons variant="desktop" />
+    </div>
+  );
+  

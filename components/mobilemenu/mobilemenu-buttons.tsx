@@ -1,18 +1,10 @@
 "use client";
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthButtons } from '../auth-buttons';
+import { NavigationItem } from '@/types/navigation';
 
 // Mobile Menu Component
-export const MobileMenu = ({ isOpen, items = [
-  { label: 'Home', href: '/' },
-  { label: 'Courses', href: '/courses' },
-  { label: 'Enrollments', href: '/enrollments' },
-  { label: 'Study Sessions', href: '/study-sessions/demo' },
-  { label: 'Achievements', href: '/achievements' },
-  { label: 'Messages', href: '/messages' },
-  { label: 'Admin Outline', href: '/admin/courses/1/outline' },
-  { label: 'Analytics', href: '/admin/analytics' }
-] }: { isOpen: boolean; items?: { label: string; href: string }[] }) => {
+export const MobileMenu = ({ isOpen, items = [] }: { isOpen: boolean; items?: NavigationItem[] }) => {
     const menuVariants = {
         hidden: {
             opacity: 0,
@@ -64,7 +56,7 @@ export const MobileMenu = ({ isOpen, items = [
                     <div className="px-4 pt-2 pb-4 space-y-1 sm:px-6 bg-white">
                         {items.map((item, index) => (
                             <motion.a
-                                key={item.label}
+                                key={item.name}
                                 href={item.href}
                                 className="block px-3 py-2 rounded-md text-base font-medium text-[#0d141c] hover:bg-gray-50"
                                 variants={menuItemVariants}
@@ -74,7 +66,7 @@ export const MobileMenu = ({ isOpen, items = [
                                 custom={index}
                                 whileHover={{ x: 5 }}
                             >
-                                {item.label}
+                                {item.name}
                             </motion.a>
                         ))}
                         <motion.div
@@ -87,6 +79,7 @@ export const MobileMenu = ({ isOpen, items = [
                             <AuthButtons variant="mobile" />
                         </motion.div>
                     </div>
+                    
                 </motion.div>
             )}
         </AnimatePresence>

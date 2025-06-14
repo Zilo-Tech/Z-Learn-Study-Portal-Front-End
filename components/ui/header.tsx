@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Logo } from './logo';
@@ -6,18 +7,15 @@ import { DesktopNavigation } from '../desktopnav';
 import { MobileMenuButton } from '../mobilemenu';
 import { MobileMenu } from '../mobilemenu/mobilemenu-buttons';
 import { usePathname } from 'next/navigation';
+import UserMenu from '../user-menu';
 
 const Header = () => {
   const pathname = usePathname();
   const navigationItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Courses', href: '/courses' },
-    { label: 'Enrollments', href: '/enrollments' },
-    { label: 'Study Sessions', href: '/study-sessions/demo' },
-    { label: 'Achievements', href: '/achievements' },
-    { label: 'Messages', href: '/messages' },
-    { label: 'Admin Outline', href: '/admin/courses/1/outline' },
-    { label: 'Analytics', href: '/admin/analytics' }
+    { id: 'home', name: 'Home', href: '/' },
+    { id: 'courses', name: 'Courses', href: '/courses' },
+    { id: 'instructors', name: 'Instructors', href: '/instructors' },
+    { id: 'pricing', name: 'Pricing', href: '/pricing' }
   ];
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -39,11 +37,15 @@ const Header = () => {
 
   return (
     <header className={`${pathname === "/" && "sticky top-0"} w-full z-50 bg-white border-b`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className=" px-4 sm:px-6 lg:px-14">
         <div className="flex items-center justify-between h-16 py-4">
           <Logo />
           <DesktopNavigation items={navigationItems} />
-          <MobileMenuButton isMenuOpen={isMenuOpen} onToggle={toggleMenu} />
+          <div className="flex items-center">
+            <UserMenu />
+            <MobileMenuButton isMenuOpen={isMenuOpen} onToggle={toggleMenu} />
+
+          </div>
         </div>
       </div>
 

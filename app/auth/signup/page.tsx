@@ -13,8 +13,9 @@ export default function SignUpPage() {
   }, []);
 
   return (
-    <div className="container relative flex min-h-screen flex-col justify-center sm:items-center md:grid lg:max-w-none lg:grid-cols-2 px-4 lg:px-0">
+    <div className="container relative flex min-h-screen flex-col justify-center sm:items-center md:grid lg:max-w-none lg:grid-cols-2 px-4 lg:px-0 mx-auto">
       {/* Video Background Section */}
+    
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r overflow-hidden">
         <video
           ref={videoRef}
@@ -42,21 +43,20 @@ export default function SignUpPage() {
 
         <div className="relative z-20 mt-auto">
           <blockquote className="space-y-2 backdrop-blur-sm bg-black/30 p-6 rounded-lg">
-            <p className="text-lg">
-              <p className="text-lg">
-                &quot;I went from beginner to job-ready in 3 months with Z-Learn&apos;s personalized learning paths.&quot;
-              </p>
-
-            </p>
+          
+          <div className="text-lg">
+              &quot;CyberShield has transformed how we handle our cybersecurity training. The platform is intuitive, comprehensive, and truly effective.&quot;
+            </div>
             <footer className="text-sm">Michael Chen</footer>
           </blockquote>
         </div>
       </div>
 
       {/* Auth Form Section */}
-      <div className="lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
-          <AuthForm type="signup" />
+      <div className="lg:p-8 w-full">
+        
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
+      <AuthForm type="signup" />
         </div>
       </div>
     </div>

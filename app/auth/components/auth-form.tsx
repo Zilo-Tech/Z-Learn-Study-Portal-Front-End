@@ -3,73 +3,66 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Loader2 } from 'lucide-react';
+import { Mail, User, Loader2, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox'; // Ensure this file exists at the specified path or update the path to the correct location.
 import { Logo } from '@/components/ui/logo';
+import { signIn } from 'next-auth/react';
+import { register } from '@/app/services/auth';
 
 export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-        ...(type === 'signup' && {
-            name: '',
-            confirmPassword: ''
-        })
-    });
-
-    const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const validate = () => {
-        const newErrors: Record<string, string> = {};
-
-        if (!formData.email) newErrors.email = "Email is required";
-        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-            newErrors.email = "Please enter a valid email";
-        }
-
-        if (!formData.password) newErrors.password = "Password is required";
-        else if (formData.password.length < 6) {
-            newErrors.password = "Password must be at least 6 characters";
-        }
-
-        if (type === 'signup') {
-            if (!formData.name) newErrors.name = "Name is required";
-            if (!formData.confirmPassword) {
-                newErrors.confirmPassword = "Please confirm your password";
-            } else if (formData.password !== formData.confirmPassword) {
-                newErrors.confirmPassword = "Passwords don\u2019t match";
-            }
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!validate()) return;
-
         setIsLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        const formData = new FormData(e.currentTarget);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+
         try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            alert(`${type === 'signin' ? "Signed in" : "Account created"} successfully!`);
-        } catch (error) {
-            console.error("Error during authentication:", error);
-            setErrors({ general: "An error occurred. Please try again." });
+            if (type === "signin") {
+                const result = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                });
+
+                if (result?.error) {
+                    setError(result.error);
+                } else if (result?.ok) {
+                    window.location.href = "/dashboard";
+                }
+            } else {
+                const name = formData.get("name") as string;
+                const confirmPassword = formData.get("confirm_password") as string;
+
+                if (password !== confirmPassword) {
+                    setError("Passwords do not match");
+                    setIsLoading(false);
+                    return;
+                }
+
+                const response = await register({ 
+                    full_name: name, 
+                    email, 
+                    password, 
+                    confirm_password: confirmPassword 
+                });
+
+                const message = response?.message || "Registration successful! Please check your email to activate your account.";
+                setSuccessMessage(message);
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Something went wrong");
         } finally {
             setIsLoading(false);
         }
@@ -80,11 +73,11 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="w-full mx-auto px-2 "
+            className="w-full mx-auto px-2"
         >
             <div className="text-center">
-                <div className="relative z-20 flex items-center justify-center text-lg font-medium mb-5 sm:hidden">
-                    <Logo size='dxl'  />
+                <div className="relative z-20 flex items-center justify-center font-medium mb-5 lg:hidden">
+                    <Logo size='lg' />
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight mb-5">
                     {type === 'signin' ? 'Welcome back' : 'Create an account'}
@@ -92,120 +85,122 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                 <p className="mt-2 text-sm text-muted-foreground my-8">
                     {type === 'signin'
                         ? 'Enter your credentials to access your dashboard'
-                        : 'Start your learning journey with Z-Learn'}
+                        : 'Start your learning journey with us'}
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6 border rounded-lg p-4 sm:p-4 lg:p-6" >
+            <form onSubmit={handleSubmit} className="space-y-6 border rounded-lg p-4 sm:p-4 lg:p-6">
                 {type === 'signup' && (
                     <div className="space-y-2">
-                        <Label htmlFor="name">Full Name</Label>
+                        <Label htmlFor="name">Name</Label>
                         <div className="relative">
+                            <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                             <Input
                                 id="name"
                                 name="name"
-                                type="text"
-                                value={formData.name}
-                                onChange={handleChange}
                                 placeholder="John Doe"
-                                className={errors.name ? 'border-destructive' : ''}
+                                type="text"
+                                autoCapitalize="none"
+                                autoComplete="name"
+                                autoCorrect="off"
+                                disabled={isLoading}
+                                className="pl-9"
+                                required
                             />
-                            <User className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         </div>
-                        {errors.name && (
-                            <p className="text-sm text-destructive">{errors.name}</p>
-                        )}
                     </div>
                 )}
 
                 <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email">Email</Label>
                     <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
                             id="email"
                             name="email"
+                            placeholder="name@example.com"
                             type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="you@example.com"
-                            className={errors.email ? 'border-destructive' : ''}
+                            autoCapitalize="none"
+                            autoComplete="email"
+                            autoCorrect="off"
+                            disabled={isLoading}
+                            className="pl-9"
+                            required
                         />
-                        <Mail className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     </div>
-                    {errors.email && (
-                        <p className="text-sm text-destructive">{errors.email}</p>
-                    )}
                 </div>
 
                 <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
                     <div className="relative">
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-3 text-muted-foreground"
+                        >
+                            {showPassword ? (
+                                <EyeOff className="h-4 w-4" />
+                            ) : (
+                                <Eye className="h-4 w-4" />
+                            )}
+                        </button>
                         <Input
                             id="password"
                             name="password"
-                            type="password"
-                            value={formData.password}
-                            onChange={handleChange}
                             placeholder="••••••••"
-                            className={errors.password ? 'border-destructive' : ''}
+                            type={showPassword ? "text" : "password"}
+                            autoCapitalize="none"
+                            autoComplete="new-password"
+                            disabled={isLoading}
+                            required
                         />
-                        <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     </div>
-                    {errors.password && (
-                        <p className="text-sm text-destructive">{errors.password}</p>
-                    )}
                 </div>
 
                 {type === 'signup' && (
                     <div className="space-y-2">
-                        <Label htmlFor="confirmPassword">Confirm Password</Label>
+                        <Label htmlFor="confirm_password">Confirm Password</Label>
                         <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-3 text-muted-foreground"
+                            >
+                                {showConfirmPassword ? (
+                                    <EyeOff className="h-4 w-4" />
+                                ) : (
+                                    <Eye className="h-4 w-4" />
+                                )}
+                            </button>
                             <Input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
+                                id="confirm_password"
+                                name="confirm_password"
                                 placeholder="••••••••"
-                                className={errors.confirmPassword ? 'border-destructive' : ''}
+                                type={showConfirmPassword ? "text" : "password"}
+                                autoCapitalize="none"
+                                autoComplete="new-password"
+                                disabled={isLoading}
+                                required
                             />
-                            <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         </div>
-                        {errors.confirmPassword && (
-                            <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-                        )}
                     </div>
                 )}
 
-                {type === 'signin' && (
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="rememberMe"
-                                checked={rememberMe}
-                                onCheckedChange={(checked) => setRememberMe(checked === true)}
-
-                            />
-                            <Label htmlFor="rememberMe">Remember me</Label>
-                        </div>
-                        <Link
-                            href="/forgot-password"
-                            className="text-sm font-medium text-primary hover:underline"
-                        >
-                            Forgot password?
-                        </Link>
+                {error && (
+                    <div className="text-sm text-red-500 text-center">
+                        {error}
                     </div>
                 )}
 
-                <Button variant={'brand'} type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                        <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Please wait...
-                        </>
-                    ) : (
-                        type === 'signin' ? 'Sign In' : 'Create Account'
-                    )}
+                {successMessage && (
+                    <div className="text-sm text-green-500 text-center">
+                        {successMessage}
+                    </div>
+                )}
+
+                <Button variant={'brand'} className='w-full' disabled={isLoading}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {type === "signin" ? "Sign In" : "Sign Up"}
                 </Button>
             </form>
 
@@ -244,7 +239,7 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
             <p className="text-center text-sm text-muted-foreground mt-4">
                 {type === 'signin' ? (
                     <>
-                         Don&apos;t have an account?{' '}
+                        Don&apos;t have an account?{' '}
                         <Link
                             href="/auth/signup"
                             className="font-semibold text-primary hover:underline"

@@ -1,6 +1,5 @@
 'use client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -323,27 +322,7 @@ export default function CoursesGrid() {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-[1250px] mx-auto relative">
       <div className="max-w-7xl mx-auto">
-        <section className="bg-gradient-to-br from-gray-800 to-blue-100 py-20 px-6 lg:px-24 rounded-xl">
-          <div className="max-w-7xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-white  mb-6 leading-tight">
-              Discover Courses That Empower Your Future
-            </h1>
-            <p className="text-white text-lg max-w-2xl mx-auto mb-10">
-              Master new skills with curated content from top instructors. Choose from hundreds of online courses tailored to your career.
-            </p>
-
-            <div className="relative max-w-xl mx-auto">
-              <input
-                type="text"
-                placeholder="Search for a course..."
-                className="w-full py-4 pl-12 pr-5 text-white rounded-full shadow-sm border border-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              />
-              <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600">
-                <Search />
-              </div>
-            </div>
-          </div>
-        </section>
+       
 
 
         {/* Filter Top Bar */}

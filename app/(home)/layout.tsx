@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/sonner';
 import { AIAssistant } from './components/ai/assistant';
 import Footer from '@/components/footer';
+import Header  from '@/components/ui/header';
 
 // Poppins - Used by Coursera, Udemy, and many modern learning platforms
 
@@ -34,9 +35,10 @@ export default function HomeLayout({
       <div className={cn(
         "min-h-screen bg-background antialiased",
         "font-source-sans", // Source Sans as default body font
-        "container mx-auto border shadow",
+        "container mx-auto",
         
       )}>
+        <Header />
         <main className="flex-1">
           {children}
           <AIAssistant />

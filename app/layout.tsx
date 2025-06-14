@@ -1,13 +1,24 @@
-import "@/app/globals.css";
-import Header from "@/components/ui/header";
-import { ReactNode } from "react";
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Providers } from "./providers";
 
-export default function COurseLayout({ children }: { children: ReactNode }) {
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "CyberShield - Cybersecurity Training Platform",
+  description: "Learn cybersecurity with our comprehensive training platform",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html>
-      <body>
-        <Header />
-        {children}
+    <html lang="en">
+      <body className={inter.className}>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
