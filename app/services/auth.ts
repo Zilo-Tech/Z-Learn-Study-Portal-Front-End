@@ -1,49 +1,42 @@
-interface LoginCredentials {
-  email: string;
-  password: string;
-}
+import axios from 'axios';
 
-interface LoginResponse {
-  access: string;
-  refresh: string;
-}
+const API_BASE_URL = 'https://z-learn-study-portal-backend.onrender.com/api';
 
-interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-}
-
-export const login = async (credentials: LoginCredentials): Promise<LoginResponse> => {
-  const response = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(credentials),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Invalid credentials");
+export const login = async (credentials: { email: string; password: string }) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/login-email/`, credentials);
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.detail || 'Login failed');
+    }
+    throw new Error('Login failed');
   }
-
-  return response.json();
 };
 
-export const register = async (data: RegisterData) => {
-  const response = await fetch("/api/auth/register", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Something went wrong");
+export const register = async (userData: {
+  full_name: string;
+  email: string;
+  password: string;
+  confirm_password: string;
+}) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/register/`, {
+      full_name: userData.full_name,
+      email: userData.email,
+      password: userData.password,
+      confirm_password: userData.confirm_password
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Registration error:', error.response?.data.email);
+      throw new Error(
+        error.response?.data?.email || 
+        error.response?.data?.detail || 
+        'Registration failed'
+      );
+    }
+    
   }
-
-  return response.json();
-}; 
+};

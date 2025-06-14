@@ -10,17 +10,20 @@ import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/ui/logo';
 import { signIn } from 'next-auth/react';
 import { register } from '@/app/services/auth';
+// ... (keep all your existing imports)
 
 export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
         setError(null);
+        setSuccessMessage(null);
 
         const formData = new FormData(e.currentTarget);
         const email = formData.get("email") as string;
@@ -36,6 +39,9 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
 
                 if (result?.error) {
                     setError(result.error);
+                } else if (result?.ok) {
+                    // Redirect or handle successful login
+                    window.location.href = "/dashboard";
                 }
             } else {
                 const name = formData.get("name") as string;
@@ -47,13 +53,14 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                     return;
                 }
 
-                await register({ name, email, password });
-                // After successful registration, sign in the user
-                await signIn("credentials", {
-                    email,
-                    password,
-                    redirect: false,
+                const response = await register({ 
+                    full_name: name, 
+                    email, 
+                    password, 
+                    confirm_password: confirmPassword 
                 });
+
+                setSuccessMessage(response.message || "Registration successful! Please check your email to activate your account.");
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : "Something went wrong");
@@ -62,6 +69,13 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
         }
     };
 
+    // ... (keep all your existing JSX, but add this after the error display)
+    {successMessage && (
+        <div className="text-sm text-green-500">
+            {successMessage}
+        </div>
+    )}
+    // ... (rest of your component remains the same)
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -181,7 +195,7 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                 )}
 
                 {error && (
-                    <div className="text-sm text-red-500">
+                    <div className="text-sm text-red-500 text-center">
                         {error}
                     </div>
                 )}
@@ -250,3 +264,4 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
         </motion.div>
     );
 }
+
