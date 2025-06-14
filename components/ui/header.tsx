@@ -1,80 +1,64 @@
-"use client";
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import { NavigationLinks } from "./navigation-links";
-import { UserMenu } from "../user-menu";
-import { AuthButtons } from "../auth-buttons";
-import { MobileMenu } from "../mobilemenu/mobilemenu-buttons";
-import Link from "next/link";
-import Image from "next/image";
-import { Logo } from "./logo";
+'use client';
 
-const navigationItems = [
-  { name: "Home", href: "/" },
-  { name: "About", href: "/about" },
-  { name: "Services", href: "/services" },
-  { name: "Contact", href: "/contact" },
-];
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Logo } from './logo';
+import { DesktopNavigation } from '../desktopnav';
+import { MobileMenuButton } from '../mobilemenu';
+import { MobileMenu } from '../mobilemenu/mobilemenu-buttons';
+import { usePathname } from 'next/navigation';
+import UserMenu from '../user-menu';
 
- const Header = () => {
+const Header = () => {
+  const pathname = usePathname();
+  const navigationItems = [
+    { id: 'home', name: 'Home', href: '/' },
+    { id: 'courses', name: 'Courses', href: '/courses' },
+    { id: 'instructors', name: 'Instructors', href: '/instructors' },
+    { id: 'pricing', name: 'Pricing', href: '/pricing' }
+  ];
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
   return (
-    <header className="bg-white border-b">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
-        <div className="flex lg:flex-1">
-        <Logo />
+    <header className={`${pathname === "/" && "sticky top-0"} w-full z-50 bg-white border-b`}>
+      <div className=" px-4 sm:px-6 lg:px-14">
+        <div className="flex items-center justify-between h-16 py-4">
+          <Logo />
+          <DesktopNavigation items={navigationItems} />
+          <div className="flex items-center">
+            <UserMenu />
+            <MobileMenuButton isMenuOpen={isMenuOpen} onToggle={toggleMenu} />
+
+          </div>
         </div>
-        <div className="flex lg:hidden">
-          <button
-            type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
-            onClick={() => setIsMenuOpen(true)}
-          >
-            <span className="sr-only">Open main menu</span>
-            <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-          </button>
-        </div>
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-8">
-          <NavigationLinks items={navigationItems} />
-          <UserMenu />
-          <AuthButtons variant="desktop" />
-        </div>
-      </nav>
+      </div>
+
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            className="lg:hidden"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
+            className="lg:hidden"
           >
-            <div className="fixed inset-0 z-50" />
-            <motion.div
-              className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10"
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 20 }}
-            >
-              <div className="flex items-center justify-between">
-                <Link href="/" className="-m-1.5 p-1.5">
-                  <span className="sr-only">CyberShield</span>
-                  <Image className="h-8 w-auto" src="/logo.svg" alt="CyberShield Logo" width={32} height={32} />
-                </Link>
-                <button
-                  type="button"
-                  className="-m-2.5 rounded-md p-2.5 text-gray-700"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <span className="sr-only">Close menu</span>
-                  <XMarkIcon className="h-6 w-6" aria-hidden="true" />
-                </button>
-              </div>
-              <MobileMenu isOpen={isMenuOpen} items={navigationItems} />
-            </motion.div>
+            <MobileMenu isOpen={isMenuOpen} items={navigationItems} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -82,4 +66,4 @@ const navigationItems = [
   );
 };
 
-export default Header;  
+export default Header;

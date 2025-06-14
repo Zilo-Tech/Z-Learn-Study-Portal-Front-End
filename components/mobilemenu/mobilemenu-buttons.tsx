@@ -79,6 +79,7 @@ export const MobileMenu = ({ isOpen, items = [] }: { isOpen: boolean; items?: Na
                             <AuthButtons variant="mobile" />
                         </motion.div>
                     </div>
+                    
                 </motion.div>
             )}
         </AnimatePresence>

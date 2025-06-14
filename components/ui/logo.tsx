@@ -30,7 +30,7 @@ export const Logo: FC<LogoProps> = ({
 
   return (
     <Link href={`/`} className={`flex items-center ${className}`} style={{ color }}>
-      <h2 className={`font-bold leading-tight tracking-[-0.015em] flex items-center justify-center ${sizeClasses[size]}`}>
+      <h2 className={`font-bold leading-tight tracking-[-0.015em] flex  justify-center text-gray-900 ${sizeClasses[size]}`}>
         Z-Le 
         <span>
           <div className={iconSizes[size]}>

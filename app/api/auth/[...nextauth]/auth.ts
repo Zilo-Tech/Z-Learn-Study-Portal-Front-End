@@ -1,6 +1,6 @@
 import { AuthOptions, DefaultSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { login, register } from "@/app/services/auth";
+import { login } from "@/app/services/auth";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {

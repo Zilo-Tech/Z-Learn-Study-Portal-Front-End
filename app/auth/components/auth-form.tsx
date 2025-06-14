@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/ui/logo';
 import { signIn } from 'next-auth/react';
 import { register } from '@/app/services/auth';
-// ... (keep all your existing imports)
 
 export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
     const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +39,6 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                 if (result?.error) {
                     setError(result.error);
                 } else if (result?.ok) {
-                    // Redirect or handle successful login
                     window.location.href = "/dashboard";
                 }
             } else {
@@ -60,7 +58,8 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                     confirm_password: confirmPassword 
                 });
 
-                setSuccessMessage(response.message || "Registration successful! Please check your email to activate your account.");
+                const message = response?.message || "Registration successful! Please check your email to activate your account.";
+                setSuccessMessage(message);
             }
         } catch (err) {
             setError(err instanceof Error ? err.message : "Something went wrong");
@@ -69,13 +68,6 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
         }
     };
 
-    // ... (keep all your existing JSX, but add this after the error display)
-    {successMessage && (
-        <div className="text-sm text-green-500">
-            {successMessage}
-        </div>
-    )}
-    // ... (rest of your component remains the same)
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -84,11 +76,11 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
             className="w-full mx-auto px-2"
         >
             <div className="text-center">
-                <div className="relative z-20 flex items-center justify-center  font-medium mb-5 lg:hidden">
+                <div className="relative z-20 flex items-center justify-center font-medium mb-5 lg:hidden">
                     <Logo size='lg' />
                 </div>
                 <h1 className="text-3xl font-bold tracking-tight mb-5">
-                    {type === 'signin' ? 'Welcome bacK' : 'Create an account'}
+                    {type === 'signin' ? 'Welcome back' : 'Create an account'}
                 </h1>
                 <p className="mt-2 text-sm text-muted-foreground my-8">
                     {type === 'signin'
@@ -200,6 +192,12 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                     </div>
                 )}
 
+                {successMessage && (
+                    <div className="text-sm text-green-500 text-center">
+                        {successMessage}
+                    </div>
+                )}
+
                 <Button variant={'brand'} className='w-full' disabled={isLoading}>
                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {type === "signin" ? "Sign In" : "Sign Up"}
@@ -264,4 +262,3 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
         </motion.div>
     );
 }
-

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { SessionProvider } from 'next-auth/react';
-import Header from '@/components/ui/header';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +9,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="">
         {/* Main Content */}
         <main className="">
-
           {children}
         </main>
       </div>
