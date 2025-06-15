@@ -1,10 +1,12 @@
 "use client";
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 import { AuthButtons } from '../auth-buttons';
 import { NavigationItem } from '@/types/navigation';
 
 // Mobile Menu Component
 export const MobileMenu = ({ isOpen, items = [] }: { isOpen: boolean; items?: NavigationItem[] }) => {
+    const { data: session } = useSession();
     const menuVariants = {
         hidden: {
             opacity: 0,
@@ -69,15 +71,17 @@ export const MobileMenu = ({ isOpen, items = [] }: { isOpen: boolean; items?: Na
                                 {item.name}
                             </motion.a>
                         ))}
-                        <motion.div
-                            variants={menuItemVariants}
-                            initial="hidden"
-                            animate="visible"
-                            exit="hidden"
-                            custom={items.length}
-                        >
-                            <AuthButtons variant="mobile" />
-                        </motion.div>
+                        {!session && (
+                            <motion.div
+                                variants={menuItemVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="hidden"
+                                custom={items.length}
+                            >
+                                <AuthButtons variant="mobile" />
+                            </motion.div>
+                        )}
                     </div>
                     
                 </motion.div>
