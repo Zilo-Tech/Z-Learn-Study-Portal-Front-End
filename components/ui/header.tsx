@@ -2,15 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 import { Logo } from './logo';
 import { DesktopNavigation } from '../desktopnav';
 import { MobileMenuButton } from '../mobilemenu';
 import { MobileMenu } from '../mobilemenu/mobilemenu-buttons';
+import { AuthButtons } from '../auth-buttons';
 import { usePathname } from 'next/navigation';
 import UserMenu from '../user-menu';
 
 const Header = () => {
   const pathname = usePathname();
+  const { data: session } = useSession();
   const navigationItems = [
     { id: 'home', name: 'Home', href: '/' },
     { id: 'courses', name: 'Courses', href: '/courses' },
@@ -36,15 +39,21 @@ const Header = () => {
   }, [isMenuOpen]);
 
   return (
-    <header className={`${pathname === "/" && "sticky top-0"} w-full z-50 bg-white border-b`}>
-      <div className=" px-4 sm:px-6 lg:px-14">
+    <header className={`${pathname === "/" && "sticky top-0"} w-full z-50 bg-white border-b border-gray-200 shadow-sm`}>
+      <div className="px-4 sm:px-6 lg:px-14">
         <div className="flex items-center justify-between h-16 py-4">
           <Logo />
           <DesktopNavigation items={navigationItems} />
-          <div className="flex items-center">
-            <UserMenu />
+          <div className="flex items-center gap-4">
+            {/* Show auth buttons if not logged in, UserMenu if logged in */}
+            {session ? (
+              <UserMenu />
+            ) : (
+              <div className="hidden md:block">
+                <AuthButtons variant="desktop" />
+              </div>
+            )}
             <MobileMenuButton isMenuOpen={isMenuOpen} onToggle={toggleMenu} />
-
           </div>
         </div>
       </div>

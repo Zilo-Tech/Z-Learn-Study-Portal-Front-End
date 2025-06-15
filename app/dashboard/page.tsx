@@ -4,6 +4,7 @@ import { Logo } from '@/components/ui/logo';
 import { BookOpenText, ChevronLeft, ChevronRight, LayoutDashboard, List } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { 
   AreaChart, 
@@ -100,18 +101,40 @@ export default function Dashboard() {
           </button>
         </div>
         
-        {/* User Profile */}
+        {/* Enhanced User Profile */}
         <div className="p-4">
-          <div className="flex items-center p-3 mb-4 rounded-lg bg-gray-100">
-            <div className="w-10 h-10 rounded-full bg-brand flex items-center justify-center text-white font-bold">
-              {session?.user?.name?.charAt(0) || 'G'}
-            </div>
+          <div className="flex items-center p-4 mb-4 rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 border border-gray-200">
+            {session?.user?.avatar ? (
+              <Image
+                src={session.user.avatar}
+                alt={session.user?.full_name || session.user?.name || 'User'}
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+                {session?.user?.full_name?.charAt(0) || session?.user?.name?.charAt(0) || 'G'}
+              </div>
+            )}
             {sidebarOpen && (
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-700 truncate">
-                  {session?.user?.name || 'Guest'}
+              <div className="ml-4 flex-1">
+                <p className="text-sm font-semibold text-gray-900 truncate">
+                  {session?.user?.full_name || session?.user?.name || 'Guest User'}
                 </p>
-                <p className="text-xs text-gray-500">Student</p>
+                <p className="text-xs text-gray-600">
+                  {session?.user?.is_instructor ? 'Instructor' : 'Student'}
+                </p>
+                {(session?.user?.courses_enrolled || session?.user?.achievements) && (
+                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                    {session?.user?.courses_enrolled && (
+                      <span>{session.user.courses_enrolled} courses</span>
+                    )}
+                    {session?.user?.achievements && (
+                      <span>{session.user.achievements} achievements</span>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

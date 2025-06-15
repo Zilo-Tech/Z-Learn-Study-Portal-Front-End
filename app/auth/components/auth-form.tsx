@@ -39,7 +39,10 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                 if (result?.error) {
                     setError(result.error);
                 } else if (result?.ok) {
-                    window.location.href = "/dashboard";
+                    setSuccessMessage("Login successful! Redirecting to dashboard...");
+                    setTimeout(() => {
+                        window.location.href = "/dashboard";
+                    }, 1500);
                 }
             } else {
                 const name = formData.get("name") as string;
@@ -187,15 +190,33 @@ export function AuthForm({ type = "signin" }: { type?: "signin" | "signup" }) {
                 )}
 
                 {error && (
-                    <div className="text-sm text-red-500 text-center">
-                        {error}
-                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"
+                    >
+                        <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {error}
+                        </div>
+                    </motion.div>
                 )}
 
                 {successMessage && (
-                    <div className="text-sm text-green-500 text-center">
-                        {successMessage}
-                    </div>
+                    <motion.div 
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm"
+                    >
+                        <div className="flex items-center gap-2">
+                            <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {successMessage}
+                        </div>
+                    </motion.div>
                 )}
 
                 <Button variant={'brand'} className='w-full' disabled={isLoading}>
