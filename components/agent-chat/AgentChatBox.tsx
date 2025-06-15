@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Bot, User, FileText, Brain, HelpCircle } from 'lucide-react';
+import { Send, Loader2, Bot, User, FileText, Brain, HelpCircle, Trash2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import axios from 'axios';
+import { API_BASE_URL } from '@/lib/constants';
 
 interface Message {
   id: string;
@@ -11,6 +12,15 @@ interface Message {
   timestamp: Date;
   type?: 'text' | 'action' | 'ask' | 'summarize' | 'quiz';
 }
+
+interface HistoryMessage {
+  id: number;
+  sender: 'user' | 'agent';
+  content: string;
+  timestamp: string;
+}
+
+
 
 interface AgentChatBoxProps {
   _sessionId?: string;
@@ -36,23 +46,70 @@ const AgentChatBox = ({
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [debugMode, setDebugMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize conversation
+  // Load conversation history on mount
   useEffect(() => {
+    const loadConversationHistory = async () => {
+      if (!lessonId || !courseId || !session?.accessToken) return;
+      
+      try {
+        setIsLoadingHistory(true);
+        const response = await axios.get(`${API_BASE_URL}/agent-chat-history/`, {
+          params: {
+            lesson_id: lessonId,
+            course_id: courseId,
+            limit: 50
+          },
+          headers: {
+            'Authorization': `Bearer ${session.accessToken}`,
+          }
+        });
+
+        const historyData = response.data;
+        console.log('[AgentChatBox] Loaded conversation history:', historyData);
+
+        if (historyData.messages && Array.isArray(historyData.messages)) {
+          const historyMessages: Message[] = historyData.messages.map((msg: HistoryMessage) => ({
+            id: msg.id?.toString() || Date.now().toString(),
+            sender: msg.sender === 'user' ? 'user' : 'agent',
+            text: msg.content || '',
+            timestamp: new Date(msg.timestamp),
+            type: 'text'
+          }));
+
+          setMessages(historyMessages);
+        }
+      } catch (error) {
+        console.error('[AgentChatBox] Failed to load conversation history:', error);
+        // Don't show error to user, just start with welcome message
+      } finally {
+        setIsLoadingHistory(false);
+      }
+    };
+
     if (!isInitialized) {
-      const welcomeMessage: Message = {
-        id: Date.now().toString(),
-        sender: 'agent',
-        text: `Hello! I'm your AI learning assistant. I'm here to help you understand this lesson better. Feel free to ask me questions about the content, request summaries, or take a quick quiz!`,
-        timestamp: new Date(),
-        type: 'text'
-      };
-      setMessages([welcomeMessage]);
-      setIsInitialized(true);
+      loadConversationHistory().then(() => {
+        // Add welcome message if no history exists
+        setMessages(prev => {
+          if (prev.length === 0) {
+            return [{
+              id: Date.now().toString(),
+              sender: 'agent',
+              text: `Hello! I'm your AI learning assistant. I'm here to help you understand this lesson better. Feel free to ask me questions about the content, request summaries, or take a quick quiz!`,
+              timestamp: new Date(),
+              type: 'text'
+            }];
+          }
+          return prev;
+        });
+        setIsInitialized(true);
+      });
     }
-  }, [isInitialized]);
+  }, [isInitialized, lessonId, courseId, session?.accessToken]);
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -102,7 +159,7 @@ const AgentChatBox = ({
 
       // Call your AI backend endpoint with authentication
       const response = await axios.post(
-        'https://z-learn-study-portal-backend.onrender.com/api/agent-chat/',
+        `${API_BASE_URL}/agent-chat/`,
         {
           message: userMessage,
           context: context,
@@ -116,11 +173,44 @@ const AgentChatBox = ({
         }
       );
 
+      console.log('[AgentChatBox] Backend response:', response.data);
+      console.log('[AgentChatBox] Response status:', response.status);
+      console.log('[AgentChatBox] Response headers:', response.headers);
+
+      // Handle different possible response formats from backend
+      let aiResponseText = '';
+      if (response.data) {
+        console.log('[AgentChatBox] Response data type:', typeof response.data);
+        console.log('[AgentChatBox] Response data keys:', Object.keys(response.data));
+        
+        // Try different possible field names for the AI response
+        aiResponseText = response.data.response || 
+                        response.data.message || 
+                        response.data.content || 
+                        response.data.reply ||
+                        response.data.answer ||
+                        response.data.text ||
+                        '';
+        
+        // If response.data is a string, use it directly
+        if (typeof response.data === 'string') {
+          aiResponseText = response.data;
+        }
+        
+        console.log('[AgentChatBox] Extracted AI response text:', aiResponseText);
+      }
+
+      // Fallback message if no valid response found
+      if (!aiResponseText || aiResponseText.trim() === '') {
+        console.warn('[AgentChatBox] No valid response text found in:', response.data);
+        aiResponseText = "I received your message, but I'm having trouble formulating a response right now. Could you please rephrase your question?";
+      }
+
       // Add AI response to chat
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'agent',
-        text: response.data.response || "I'm here to help! Could you please rephrase your question?",
+        text: aiResponseText,
         timestamp: new Date(),
         type: 'text'
       };
@@ -128,7 +218,14 @@ const AgentChatBox = ({
       setMessages(prev => [...prev, aiResponse]);
 
     } catch (error) {
-      console.error('Error sending message to AI:', error);
+      console.error('[AgentChatBox] Error sending message to AI:', error);
+      
+      // Log the full error details for debugging
+      if (axios.isAxiosError(error)) {
+        console.error('[AgentChatBox] Response data:', error.response?.data);
+        console.error('[AgentChatBox] Response status:', error.response?.status);
+        console.error('[AgentChatBox] Response headers:', error.response?.headers);
+      }
       
       // Handle different error types
       let errorText = "I'm having trouble connecting right now. Please try again in a moment!";
@@ -138,8 +235,15 @@ const AgentChatBox = ({
           errorText = "Your session has expired. Please sign in again to continue using the AI assistant.";
         } else if (error.response?.status === 403) {
           errorText = "You don&apos;t have permission to use the AI assistant for this lesson.";
+        } else if (error.response?.status === 500) {
+          errorText = "The AI service is temporarily unavailable. Please try again in a moment.";
         } else if (error.response?.data?.error) {
           errorText = error.response.data.error;
+        } else if (error.response?.data?.detail) {
+          errorText = error.response.data.detail;
+        } else if (error.response?.data) {
+          // If there's response data but no specific error field, show generic message
+          errorText = "I encountered an issue processing your request. Please try rephrasing your question.";
         }
       }
       
@@ -192,6 +296,17 @@ const AgentChatBox = ({
     onQuickAction?.(actionType);
   };
 
+  // Clear conversation
+  const clearConversation = () => {
+    setMessages([{
+      id: Date.now().toString(),
+      sender: 'agent',
+      text: `Hello! I'm your AI learning assistant. I'm here to help you understand this lesson better. Feel free to ask me questions about the content, request summaries, or take a quick quiz!`,
+      timestamp: new Date(),
+      type: 'text'
+    }]);
+  };
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
       {/* Header */}
@@ -199,12 +314,31 @@ const AgentChatBox = ({
         <div className="w-8 h-8 bg-gradient-to-r from-[#446d6d] to-[#002424] rounded-full flex items-center justify-center">
           <Bot className="w-5 h-5 text-white" />
         </div>
-        <div>
+        <div className="flex-1">
           <h3 className="font-semibold text-gray-900">AI Learning Assistant</h3>
           <p className="text-sm text-gray-600">Ask questions, get summaries, or take quizzes</p>
         </div>
+        
+        {/* Action buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setDebugMode(!debugMode)}
+            className="p-1.5 text-gray-500 hover:text-[#446d6d] transition-colors"
+            title="Toggle debug mode"
+          >
+            <FileText className="w-4 h-4" />
+          </button>
+          <button
+            onClick={clearConversation}
+            className="p-1.5 text-gray-500 hover:text-red-500 transition-colors"
+            title="Clear conversation"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+        
         {_sessionId && (
-          <div className="ml-auto text-xs text-gray-400 font-mono">
+          <div className="text-xs text-gray-400 font-mono">
             Session: {_sessionId.slice(-8)}
           </div>
         )}
@@ -212,6 +346,16 @@ const AgentChatBox = ({
 
       {/* Messages */}
       <div className="h-80 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        {/* Loading history indicator */}
+        {isLoadingHistory && (
+          <div className="flex justify-center items-center py-4">
+            <div className="flex items-center gap-2 text-gray-500">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span className="text-sm">Loading conversation history...</span>
+            </div>
+          </div>
+        )}
+        
         {messages.map((message) => (
           <div
             key={message.id}
@@ -261,6 +405,23 @@ const AgentChatBox = ({
         
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Debug Panel */}
+      {debugMode && (
+        <div className="px-4 py-3 border-t border-gray-200 bg-yellow-50">
+          <div className="text-xs">
+            <div className="font-semibold text-yellow-800 mb-2">Debug Information</div>
+            <div className="space-y-1 text-yellow-700">
+              <div>Lesson ID: {lessonId || 'Not set'}</div>
+              <div>Course ID: {courseId || 'Not set'}</div>
+              <div>Module ID: {moduleId || 'Not set'}</div>
+              <div>Session Token: {session?.accessToken ? 'Present' : 'Missing'}</div>
+              <div>API Base URL: {API_BASE_URL}</div>
+              <div>Messages Count: {messages.length}</div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick Action Buttons */}
       <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">

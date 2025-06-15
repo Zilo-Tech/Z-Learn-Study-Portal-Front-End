@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { API_BASE_URL } from './constants';
 
 const api = axios.create({
-  baseURL: 'https://z-learn-study-portal-backend.onrender.com/api',
+  baseURL: API_BASE_URL,
 });
 
 // Request interceptor to add auth token

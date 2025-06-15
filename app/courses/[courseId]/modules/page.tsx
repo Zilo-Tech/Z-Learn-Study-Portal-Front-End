@@ -3,6 +3,7 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BookOpen, PlayCircle, Clock, CheckCircle } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/constants';
 
 interface Lesson {
   id: number;
@@ -42,7 +43,7 @@ export default function ModulesPage() {
     async function fetchCourseData() {
       try {
         setLoading(true);
-        const res = await axios.get(`https://z-learn-study-portal-backend.onrender.com/api/courses/${courseId}/details/`);
+        const res = await axios.get(`${API_BASE_URL}/courses/${courseId}/details/`);
         setCourse(res.data);
       } catch (err) {
         console.error('Error fetching course:', err);

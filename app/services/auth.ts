@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'https://z-learn-study-portal-backend.onrender.com/api';
+import { API_BASE_URL } from '@/lib/constants';
 
 // Enhanced user profile interface
 export interface UserProfile {

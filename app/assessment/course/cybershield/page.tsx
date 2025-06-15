@@ -96,15 +96,10 @@ function CyberShieldCourseContent() {
                                 <p key={i} className="mb-4 leading-relaxed">{p}</p>
                             ))}
                         </div>
-                        {/* Agent chat and interactive buttons */}
+                        {/* Agent chat */}
                         <div className="bg-gray-50 rounded-lg shadow p-6 mb-6">
                             <h3 className="text-xl font-semibold mb-2">Chat with Z-Learn Agent</h3>
                             <AgentChatBox _mockMode />
-                            <div className="flex gap-2 mt-4 justify-center">
-                                <button className="bg-blue-500 text-white px-3 py-1 rounded">Ask Agent</button>
-                                <button className="bg-blue-500 text-white px-3 py-1 rounded">Summarize</button>
-                                <button className="bg-blue-500 text-white px-3 py-1 rounded">Quiz Me</button>
-                            </div>
                         </div>
                         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-8">
                             <button

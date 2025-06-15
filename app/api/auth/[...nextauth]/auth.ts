@@ -143,5 +143,21 @@ export const authOptions: AuthOptions = {
       return session;
     },
   },
+  // Add essential environment variables for production
+  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-key-change-in-production',
   debug: process.env.NODE_ENV === 'development',
+  // Add error handling for better debugging
+  logger: {
+    error(code, metadata) {
+      console.error('[NextAuth Error]', code, metadata);
+    },
+    warn(code) {
+      console.warn('[NextAuth Warning]', code);
+    },
+    debug(code, metadata) {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[NextAuth Debug]', code, metadata);
+      }
+    }
+  }
 };

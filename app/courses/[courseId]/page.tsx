@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import { Star, Clock, Users, Award, BookOpen, PlayCircle, Loader2 } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/constants';
 
 interface Lesson {
   id: number;
@@ -55,7 +56,7 @@ export default function CourseDetailPage() {
         console.log('[CourseDetailPage] Fetching course:', courseId);
         
         // Use direct axios call to avoid localStorage/server issues
-        const res = await axios.get(`https://z-learn-study-portal-backend.onrender.com/api/courses/${courseId}/details/`);
+        const res = await axios.get(`${API_BASE_URL}/courses/${courseId}/details/`);
         console.log('[CourseDetailPage] API response:', res);
         
         const courseData = res.data;

@@ -15,6 +15,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import AgentChatBox from '@/components/agent-chat/AgentChatBox';
+import { API_BASE_URL } from '@/lib/constants';
 
 interface Course {
   id: string;
@@ -60,7 +61,7 @@ export default function LessonPage() {
     async function fetchCourseData() {
       try {
         setLoading(true);
-        const res = await axios.get(`https://z-learn-study-portal-backend.onrender.com/api/courses/${courseId}/details/`);
+        const res = await axios.get(`${API_BASE_URL}/courses/${courseId}/details/`);
         const courseData: Course = res.data;
         setCourse(courseData);
 
