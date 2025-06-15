@@ -58,9 +58,9 @@ const AgentChatBox = ({
       
       try {
         setIsLoadingHistory(true);
-        const response = await axios.get(`${API_BASE_URL}/agent-chat-history/`, {
+        // Use the new lesson-specific chat history endpoint
+        const response = await axios.get(`${API_BASE_URL}/lessons/${lessonId}/chat-history/`, {
           params: {
-            lesson_id: lessonId,
             course_id: courseId,
             limit: 50
           },
@@ -184,7 +184,8 @@ const AgentChatBox = ({
         console.log('[AgentChatBox] Response data keys:', Object.keys(response.data));
         
         // Try different possible field names for the AI response
-        aiResponseText = response.data.response || 
+        aiResponseText = response.data.agent_message || 
+                        response.data.response || 
                         response.data.message || 
                         response.data.content || 
                         response.data.reply ||
