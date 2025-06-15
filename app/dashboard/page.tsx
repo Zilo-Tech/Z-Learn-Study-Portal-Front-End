@@ -113,7 +113,7 @@ export default function Dashboard() {
                 className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
               />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#446d6d] to-[#002424] flex items-center justify-center text-white font-bold text-lg shadow-sm">
                 {session?.user?.full_name?.charAt(0) || session?.user?.name?.charAt(0) || 'G'}
               </div>
             )}

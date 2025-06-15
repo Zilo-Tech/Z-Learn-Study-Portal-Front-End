@@ -129,7 +129,7 @@ export default function ModulesPage() {
                     <div className="flex items-start gap-6">
                       {/* Module Number */}
                       <div className="flex-shrink-0">
-                        <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                        <div className="w-16 h-16 bg-gradient-to-r from-[#446d6d] to-[#002424] rounded-full flex items-center justify-center text-white font-bold text-xl">
                           {index + 1}
                         </div>
                       </div>
@@ -191,7 +191,7 @@ export default function ModulesPage() {
                               const firstLessonId = module.lessons?.[0]?.id || '1';
                               router.push(`/courses/${courseId}/modules/${module.id}/lessons/${firstLessonId}${level ? `?level=${level}` : ''}`);
                             }}
-                            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-2"
+                            className="bg-gradient-to-r from-[#446d6d] to-[#002424] text-white px-8 py-3 rounded-xl font-semibold hover:from-[#446d6d]/80 hover:to-[#002424]/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-2"
                           >
                             <PlayCircle className="w-5 h-5" />
                             Start Module

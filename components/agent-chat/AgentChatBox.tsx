@@ -195,8 +195,8 @@ const AgentChatBox = ({
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50 rounded-t-xl">
-        <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+      <div className="flex items-center gap-3 p-4 border-b border-gray-200 bg-gradient-to-r from-[#446d6d]/10 to-[#002424]/10 rounded-t-xl">
+        <div className="w-8 h-8 bg-gradient-to-r from-[#446d6d] to-[#002424] rounded-full flex items-center justify-center">
           <Bot className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -220,23 +220,23 @@ const AgentChatBox = ({
             <div
               className={`max-w-[80%] rounded-xl px-4 py-3 shadow-sm ${
                 message.sender === 'user'
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                  ? 'bg-gradient-to-r from-[#446d6d] to-[#002424] text-white'
                   : 'bg-white border border-gray-200 text-gray-800'
               }`}
             >
               <div className="flex items-start gap-2">
                 {message.sender === 'agent' && (
-                  <Bot className="w-4 h-4 mt-1 text-blue-600 flex-shrink-0" />
+                  <Bot className="w-4 h-4 mt-1 text-[#446d6d] flex-shrink-0" />
                 )}
                 {message.sender === 'user' && (
-                  <User className="w-4 h-4 mt-1 text-blue-100 flex-shrink-0" />
+                  <User className="w-4 h-4 mt-1 text-white/80 flex-shrink-0" />
                 )}
                 <div className="flex-1">
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">
                     {message.text}
                   </p>
                   <span className={`text-xs mt-1 block ${
-                    message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
+                    message.sender === 'user' ? 'text-white/70' : 'text-gray-500'
                   }`}>
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
@@ -251,8 +251,8 @@ const AgentChatBox = ({
           <div className="flex justify-start">
             <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm">
               <div className="flex items-center gap-2">
-                <Bot className="w-4 h-4 text-blue-600" />
-                <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                <Bot className="w-4 h-4 text-[#446d6d]" />
+                <Loader2 className="w-4 h-4 animate-spin text-[#446d6d]" />
                 <span className="text-sm text-gray-600">Thinking...</span>
               </div>
             </div>
@@ -304,12 +304,12 @@ const AgentChatBox = ({
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Type your question or message..."
             disabled={isLoading}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#446d6d] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <button
             type="submit"
             disabled={!inputText.trim() || isLoading}
-            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 font-medium shadow-sm hover:shadow-md"
+            className="px-6 py-2 bg-gradient-to-r from-[#446d6d] to-[#002424] text-white rounded-lg hover:from-[#446d6d]/80 hover:to-[#002424]/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 font-medium shadow-sm hover:shadow-md"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

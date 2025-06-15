@@ -243,7 +243,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
 
                 <Link 
                   href={`/level-selection?course=${course.id || resolvedParams.courseId}`}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-center block mb-6"
+                  className="w-full bg-gradient-to-r from-[#446d6d] to-[#002424] text-white px-6 py-4 rounded-xl font-semibold text-lg hover:from-[#446d6d]/80 hover:to-[#002424]/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-center block mb-6"
                 >
                   <PlayCircle className="w-6 h-6 inline mr-2" />
                   Start Learning

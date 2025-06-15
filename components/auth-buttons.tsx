@@ -43,7 +43,7 @@ export const AuthButtons = ({ variant = "desktop" }) => {
             isDesktop
               ? "flex items-center gap-2 px-4 py-2 rounded-lg"
               : "flex items-center gap-2 px-4 py-2 rounded-lg"
-          } bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-sm hover:shadow-md`}
+          } bg-gradient-to-r from-[#446d6d] to-[#002424] text-white hover:from-[#446d6d]/80 hover:to-[#002424]/80 transition-all duration-200 font-semibold shadow-sm hover:shadow-md`}
         >
           <UserPlus className="w-4 h-4" />
           <span>Sign Up</span>

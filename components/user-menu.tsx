@@ -48,7 +48,7 @@ const UserMenu = () => {
               className="w-9 h-9 rounded-full object-cover border-2 border-white shadow-sm"
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-r from-[#446d6d] to-[#002424] flex items-center justify-center text-white font-semibold text-sm shadow-sm">
               {getInitials(userDisplayName)}
             </div>
           )}
@@ -72,7 +72,7 @@ const UserMenu = () => {
       {/* Enhanced Profile Sidebar */}
       <div className={`fixed top-0 right-0 h-full bg-white shadow-2xl z-50 w-96 transition-all duration-300 border-l border-gray-200 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         {/* Enhanced Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+        <div className="bg-gradient-to-r from-[#446d6d] to-[#002424] p-6 text-white">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold">Profile</h3>
             <button 
