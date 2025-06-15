@@ -2,150 +2,14 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-const allCourses = [
-  {
-    id: 'cybershield',
-    title: 'CyberShield',
-    description: 'Master cybersecurity fundamentals and protect against digital threats',
-    icon: '🛡️',
-    level: 'Beginner',
-    duration: '8 Weeks',
-    features: [
-      'Hands-on labs',
-      'Real-world scenarios',
-      'Industry-recognized certification'
-    ],
-    category: 'IT & Software',
-    price: 99.99,
-    originalPrice: 129.99,
-    rating: 4.7,
-    reviews: 1243,
-    hours: 120,
-    instructor: 'Lisa Baker',
-    isFree: false,
-    image: '/assets/images/course/cybersecurity.jpg',
-    color: 'from-blue-500 to-purple-600'
-  },
-  {
-    id: 'ai-mastery',
-    title: 'AI Mastery',
-    description: 'Learn artificial intelligence and machine learning from the ground up',
-    icon: '🤖',
-    level: 'Intermediate',
-    duration: '12 Weeks',
-    features: [
-      'TensorFlow projects',
-      'Neural network design',
-      'Model optimization'
-    ],
-    category: 'Development',
-    price: 149.99,
-    originalPrice: 199.99,
-    rating: 4.9,
-    reviews: 892,
-    hours: 180,
-    instructor: 'Kevin Taylor',
-    isFree: false,
-    image: '/assets/images/course/ai.jpg',
-    color: 'from-purple-500 to-pink-600'
-  },
-  {
-    id: 'cloud-architect',
-    title: 'Cloud Architect',
-    description: 'Design and deploy scalable cloud solutions',
-    icon: '☁️',
-    level: 'Expert',
-    duration: '10 Weeks',
-    features: [
-      'AWS/Azure/GCP',
-      'Serverless architecture',
-      'Cloud security'
-    ],
-    category: 'IT & Software',
-    price: 0,
-    rating: 4.5,
-    reviews: 756,
-    hours: 150,
-    instructor: 'Catherine Parker',
-    isFree: true,
-    image: '/assets/images/course/cloud.jpg',
-    color: 'from-cyan-500 to-brand'
-  },
-  {
-    id: 'web-design',
-    title: 'Modern Web Design',
-    description: 'Create stunning websites with modern design principles',
-    icon: '🎨',
-    level: 'Beginner',
-    duration: '6 Weeks',
-    features: [
-      'Responsive design',
-      'UI/UX principles',
-      'Portfolio projects'
-    ],
-    category: 'Design',
-    price: 79.99,
-    originalPrice: 99.99,
-    rating: 4.6,
-    reviews: 1156,
-    hours: 90,
-    instructor: 'Brandy Carlson',
-    isFree: false,
-    image: '/assets/images/course/design.jpg',
-    color: 'from-pink-500 to-rose-600'
-  },
-  {
-    id: 'digital-marketing',
-    title: 'Digital Marketing Mastery',
-    description: 'Master digital marketing strategies and grow your business',
-    icon: '📈',
-    level: 'Intermediate',
-    duration: '8 Weeks',
-    features: [
-      'SEO optimization',
-      'Social media marketing',
-      'Analytics and reporting'
-    ],
-    category: 'Marketing',
-    price: 0,
-    rating: 4.4,
-    reviews: 623,
-    hours: 120,
-    instructor: 'Lisa Baker',
-    isFree: true,
-    image: '/assets/images/course/marketing.jpg',
-    color: 'from-green-500 to-teal-600'
-  },
-  {
-    id: 'business-strategy',
-    title: 'Business Strategy & Leadership',
-    description: 'Develop strategic thinking and leadership skills',
-    icon: '💼',
-    level: 'Expert',
-    duration: '10 Weeks',
-    features: [
-      'Strategic planning',
-      'Team leadership',
-      'Decision making'
-    ],
-    category: 'Business',
-    price: 199.99,
-    rating: 4.8,
-    reviews: 445,
-    hours: 160,
-    instructor: 'Kevin Taylor',
-    isFree: false,
-    image: '/assets/images/course/business.jpg',
-    color: 'from-orange-500 to-red-600'
-  }
-];
+import api from '../../lib/api';
 
 export default function CoursesGrid() {
   const router = useRouter();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filteredCourses, setFilteredCourses] = useState(allCourses);
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [sortBy, setSortBy] = useState('default');
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
 
   // Filter states
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -154,7 +18,40 @@ export default function CoursesGrid() {
   const [selectedPrice, setSelectedPrice] = useState<string[]>([]);
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
 
-
+  // Fetch courses from API
+  useEffect(() => {
+    async function fetchCourses() {
+      try {
+        const res = await api.get('/courses/');
+        // Map API response to UI fields
+        const mappedCourses: Course[] = (res.data || []).map((course: Record<string, unknown>) => ({
+          id: course.id?.toString() ?? '',
+          title: course.title as string,
+          description: course.description as string,
+          icon: '📘', // Default icon, or map if available
+          level: course.level as string,
+          duration: course.duration as string,
+          features: (course.features as string[]) || [],
+          category: course.category as string,
+          price: parseFloat(course.price as string),
+          originalPrice: undefined, // Not in API
+          rating: course.rating as number,
+          reviews: course.reviews as number,
+          hours: course.hours as number,
+          instructor: course.instructor as string,
+          isFree: course.is_free as boolean,
+          image: (course.image as string) || '/assets/images/course/default.jpg',
+          color: (course.color as string) || 'from-blue-500 to-purple-600',
+        }));
+        setAllCourses(mappedCourses);
+        setFilteredCourses(mappedCourses); // Initialize filteredCourses
+      } catch {
+        setAllCourses([]);
+        setFilteredCourses([]); // Reset filteredCourses on error
+      }
+    }
+    fetchCourses();
+  }, []);
 
   // Filter and sort courses
   useEffect(() => {
@@ -217,7 +114,7 @@ export default function CoursesGrid() {
     }
 
     setFilteredCourses(filtered);
-  }, [selectedCategories, selectedRatings, selectedInstructors, selectedPrice, selectedLevels, sortBy]);
+  }, [allCourses, selectedCategories, selectedRatings, selectedInstructors, selectedPrice, selectedLevels, sortBy]);
 
   interface Course {
     id: string;
@@ -240,9 +137,7 @@ export default function CoursesGrid() {
   }
 
   const handleCourseSelect = (courseId: Course['id']): void => {
-    setTimeout(() => {
-      router.push(`/level-selection?course=${courseId}`);
-    }, 500);
+    router.push(`/level-selection?course=${courseId}`);
   };
 
   interface FilterChangeHandler {
@@ -419,8 +314,7 @@ export default function CoursesGrid() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group cursor-pointer"
-              onClick={() => handleCourseSelect(course.id)}
+              className="group"
             >
               <div className="bg-white rounded-xl border hover:shadow-lg overflow-hidden transform transition-all duration-300 group-hover:scale-[1.02]">
                 {/* Course Image */}
@@ -506,7 +400,7 @@ export default function CoursesGrid() {
                   {/* Features */}
                   {course.features && course.features.length > 0 && (
                     <div className="space-y-1 mb-4">
-                      {course.features.slice(0, 2).map((feature, i) => (
+                      {course.features.slice(0, 2).map((feature: string, i: number) => (
                         <div key={i} className="flex items-center text-sm text-gray-600">
                           <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -518,7 +412,15 @@ export default function CoursesGrid() {
                   )}
 
                   {/* Action Button */}
-                  <button className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-transparent border-2 border-gray-800 text-gray-800 rounded-lg hover:bg-gray-800 hover:text-white transition-colors duration-300 group/btn">
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-center space-x-2 py-3 px-4 bg-transparent border-2 border-gray-800 text-gray-800 rounded-lg hover:bg-gray-800 hover:text-white transition-colors duration-300 group/btn"
+                    onClick={e => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      router.push(`/courses/${course.id}`);
+                    }}
+                  >
                     <span className="font-medium">View Course</span>
                     <div className="flex space-x-1 transform group-hover/btn:translate-x-1 transition-transform duration-300">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

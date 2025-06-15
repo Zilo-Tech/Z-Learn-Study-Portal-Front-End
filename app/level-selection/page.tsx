@@ -7,6 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
+// Default levels for any course
+const defaultLevels = [
+  { id: 'beginner', title: 'Beginner', description: 'Perfect for those new to this subject.', icon: '🔰' },
+  { id: 'intermediate', title: 'Intermediate', description: 'Build on your existing knowledge.', icon: '⚡' },
+  { id: 'advanced', title: 'Advanced', description: 'Master advanced concepts and techniques.', icon: '🚀' },
+];
+
 const courses = {
   cybershield: {
     title: 'CyberShield',
@@ -47,18 +54,24 @@ function LevelSelectionContent() {
   const [selectedLevel, setSelectedLevel] = useState('');
 
   useEffect(() => {
-    if (!courseId || !courses[courseId as keyof typeof courses]) {
+    if (!courseId) {
       router.push('/courses');
     }
   }, [courseId, router]);
 
-  if (!courseId || !courses[courseId as keyof typeof courses]) return null;
+  if (!courseId) return null;
 
-  const course = courses[courseId as keyof typeof courses];
+  // Use specific course if available, otherwise use default levels
+  const course = courses[courseId as keyof typeof courses] || {
+    title: 'Course',
+    description: 'Select your level to get started',
+    icon: '📚',
+    levels: defaultLevels
+  };
 
   const handleContinue = () => {
     if (selectedLevel) {
-      router.push(`/assessment/course/${courseId}?level=${selectedLevel}`);
+      router.push(`/courses/${courseId}/modules?level=${selectedLevel}`);
     }
   };
 
