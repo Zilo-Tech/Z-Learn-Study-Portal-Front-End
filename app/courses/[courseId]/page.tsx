@@ -3,13 +3,46 @@ import Link from 'next/link';
 import axios from 'axios';
 import { Star, Clock, Users, Award, BookOpen, PlayCircle } from 'lucide-react';
 
-// Fix: Use the correct signature for Next.js App Router dynamic route (object params)
-export default async function CourseDetailPage({ params }: { params: { courseId: string } }) {
-  console.log('[CourseDetailPage] params (raw):', params);
-  let course = null;
+interface Lesson {
+  id: number;
+  title: string;
+  content?: string;
+}
+
+interface Module {
+  id: number;
+  title: string;
+  description?: string;
+  lessons: Lesson[];
+}
+
+interface CourseDetail {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  level: string;
+  duration: string;
+  price: number;
+  originalPrice?: number;
+  is_free: boolean;
+  rating: number;
+  reviews?: number;
+  students_count: number;
+  instructor: string;
+  hours?: number;
+  features?: string[];
+  modules?: Module[];
+}
+
+// Fix: Use the correct signature for Next.js App Router dynamic route with Promise params
+export default async function CourseDetailPage({ params }: { params: Promise<{ courseId: string }> }) {
+  const resolvedParams = await params;
+  console.log('[CourseDetailPage] params (raw):', resolvedParams);
+  let course: CourseDetail | null = null;
   try {
     // Use direct axios call to avoid localStorage/server issues
-    const res = await axios.get(`https://z-learn-study-portal-backend.onrender.com/api/courses/${params.courseId}/details/`);
+    const res = await axios.get(`https://z-learn-study-portal-backend.onrender.com/api/courses/${resolvedParams.courseId}/details/`);
     console.log('[CourseDetailPage] API response:', res);
     course = res.data;
   } catch (err) {
@@ -51,7 +84,7 @@ export default async function CourseDetailPage({ params }: { params: { courseId:
                 <div className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-yellow-300 fill-current" />
                   <span className="text-lg font-semibold">{course.rating}</span>
-                  <span className="text-blue-200">({course.reviews} reviews)</span>
+                  <span className="text-blue-200">({course.reviews || 0} reviews)</span>
                 </div>
                 
                 <div className="flex items-center gap-2">
@@ -67,7 +100,7 @@ export default async function CourseDetailPage({ params }: { params: { courseId:
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link 
-                  href={`/level-selection?course=${course.id || params.courseId}`}
+                  href={`/level-selection?course=${course.id || resolvedParams.courseId}`}
                   className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-blue-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-center"
                 >
                   <PlayCircle className="w-6 h-6 inline mr-2" />
@@ -130,7 +163,7 @@ export default async function CourseDetailPage({ params }: { params: { courseId:
                   Course Modules
                 </h2>
                 <div className="space-y-6">
-                  {course.modules.map((module: any, index: number) => (
+                  {course.modules.map((module: Module, index: number) => (
                     <div key={module.id} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                       <div className="flex items-start gap-4">
                         <div className="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
@@ -145,7 +178,7 @@ export default async function CourseDetailPage({ params }: { params: { courseId:
                             <div className="space-y-2">
                               <h4 className="font-semibold text-gray-700 mb-2">Lessons ({module.lessons.length})</h4>
                               <ul className="space-y-2">
-                                {module.lessons.map((lesson: any) => (
+                                {module.lessons.map((lesson: Lesson) => (
                                   <li key={lesson.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                                     <PlayCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                                     <div className="flex-1">
@@ -173,7 +206,7 @@ export default async function CourseDetailPage({ params }: { params: { courseId:
             {/* Course Features */}
             {course.features && course.features.length > 0 && (
               <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-8">What You'll Learn</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-8">What You&apos;ll Learn</h2>
                 <div className="grid md:grid-cols-2 gap-4">
                   {course.features.map((feature: string, index: number) => (
                     <div key={index} className="flex items-start gap-3 p-4 bg-green-50 rounded-lg">
@@ -209,7 +242,7 @@ export default async function CourseDetailPage({ params }: { params: { courseId:
                 </div>
 
                 <Link 
-                  href={`/level-selection?course=${course.id || params.courseId}`}
+                  href={`/level-selection?course=${course.id || resolvedParams.courseId}`}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-4 rounded-xl font-semibold text-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-center block mb-6"
                 >
                   <PlayCircle className="w-6 h-6 inline mr-2" />
@@ -238,7 +271,7 @@ export default async function CourseDetailPage({ params }: { params: { courseId:
                     <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 text-yellow-400 fill-current" />
                       <span className="font-semibold">{course.rating}</span>
-                      <span className="text-gray-500">({course.reviews})</span>
+                      <span className="text-gray-500">({course.reviews || 0})</span>
                     </div>
                   </div>
                 </div>

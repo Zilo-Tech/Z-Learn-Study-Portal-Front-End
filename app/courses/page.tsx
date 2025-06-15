@@ -136,9 +136,7 @@ export default function CoursesGrid() {
     color: string;
   }
 
-  const handleCourseSelect = (courseId: Course['id']): void => {
-    router.push(`/level-selection?course=${courseId}`);
-  };
+
 
   interface FilterChangeHandler {
     filterType: 'category' | 'rating' | 'instructor' | 'price' | 'level';

@@ -16,6 +16,26 @@ import {
 } from 'lucide-react';
 import AgentChatBox from '@/components/agent-chat/AgentChatBox';
 
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  modules?: Module[];
+}
+
+interface Module {
+  id: string;
+  title: string;
+  description?: string;
+  lessons?: Lesson[];
+}
+
+interface Lesson {
+  id: string;
+  title: string;
+  content?: string;
+}
+
 export default function LessonPage() {
   const router = useRouter();
   const params = useParams();
@@ -26,10 +46,10 @@ export default function LessonPage() {
   const lessonId = params.lessonId as string;
   const level = searchParams.get('level');
   
-  const [course, setCourse] = useState<any>(null);
-  const [currentModule, setCurrentModule] = useState<any>(null);
-  const [currentLesson, setCurrentLesson] = useState<any>(null);
-  const [allLessons, setAllLessons] = useState<any[]>([]);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [currentModule, setCurrentModule] = useState<Module | null>(null);
+  const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
+  const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,19 +61,19 @@ export default function LessonPage() {
       try {
         setLoading(true);
         const res = await axios.get(`https://z-learn-study-portal-backend.onrender.com/api/courses/${courseId}/details/`);
-        const courseData = res.data;
+        const courseData: Course = res.data;
         setCourse(courseData);
 
         // Find the current module
-        const module = courseData.modules?.find((m: any) => m.id.toString() === moduleId);
-        if (!module) {
+        const foundModule = courseData.modules?.find((m: Module) => m.id.toString() === moduleId);
+        if (!foundModule) {
           setError('Module not found');
           return;
         }
-        setCurrentModule(module);
+        setCurrentModule(foundModule);
 
         // Find the current lesson
-        const lesson = module.lessons?.find((l: any) => l.id.toString() === lessonId);
+        const lesson = foundModule.lessons?.find((l: Lesson) => l.id.toString() === lessonId);
         if (!lesson) {
           setError('Lesson not found');
           return;
@@ -61,8 +81,8 @@ export default function LessonPage() {
         setCurrentLesson(lesson);
 
         // Set all lessons for navigation
-        setAllLessons(module.lessons || []);
-        const lessonIndex = module.lessons?.findIndex((l: any) => l.id.toString() === lessonId) || 0;
+        setAllLessons(foundModule.lessons || []);
+        const lessonIndex = foundModule.lessons?.findIndex((l: Lesson) => l.id.toString() === lessonId) || 0;
         setCurrentLessonIndex(lessonIndex);
 
       } catch (err) {
@@ -191,7 +211,7 @@ export default function LessonPage() {
                 {!lessonCompleted && (
                   <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg mb-6">
                     <PlayCircle className="w-5 h-5 text-blue-600" />
-                    <span className="text-blue-800">Ready to learn? Let's dive in!</span>
+                    <span className="text-blue-800">Ready to learn? Let&apos;s dive in!</span>
                   </div>
                 )}
 
@@ -313,7 +333,7 @@ export default function LessonPage() {
                   Module Lessons
                 </h3>
                 <div className="space-y-2">
-                  {allLessons.map((lesson: any, index: number) => (
+                  {allLessons.map((lesson: Lesson, index: number) => (
                     <button
                       key={lesson.id}
                       onClick={() => router.push(`/courses/${courseId}/modules/${moduleId}/lessons/${lesson.id}${level ? `?level=${level}` : ''}`)}

@@ -4,6 +4,29 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BookOpen, PlayCircle, Clock, CheckCircle } from 'lucide-react';
 
+interface Lesson {
+  id: number;
+  title: string;
+  content?: string;
+}
+
+interface Module {
+  id: number;
+  title: string;
+  description: string;
+  lessons_count: number;
+  duration: string;
+  is_completed?: boolean;
+  lessons?: Lesson[];
+}
+
+interface CourseWithModules {
+  id: number;
+  title: string;
+  description: string;
+  modules: Module[];
+}
+
 export default function ModulesPage() {
   const router = useRouter();
   const params = useParams();
@@ -11,7 +34,7 @@ export default function ModulesPage() {
   const courseId = typeof params.courseId === 'string' ? params.courseId : Array.isArray(params.courseId) ? params.courseId[0] : '';
   const level = searchParams.get('level');
   
-  const [course, setCourse] = useState<any>(null);
+  const [course, setCourse] = useState<CourseWithModules | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,7 +123,7 @@ export default function ModulesPage() {
             </div>
 
             <div className="grid gap-6">
-              {course.modules.map((module: any, index: number) => (
+              {course.modules.map((module: Module, index: number) => (
                 <div key={module.id} className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden">
                   <div className="p-8">
                     <div className="flex items-start gap-6">
@@ -134,7 +157,7 @@ export default function ModulesPage() {
                               Lessons ({module.lessons.length})
                             </h4>
                             <div className="grid md:grid-cols-2 gap-3">
-                              {module.lessons.slice(0, 4).map((lesson: any, lessonIndex: number) => (
+                              {module.lessons.slice(0, 4).map((lesson: Lesson, lessonIndex: number) => (
                                 <div key={lesson.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                                   <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
                                     {lessonIndex + 1}
@@ -190,7 +213,7 @@ export default function ModulesPage() {
           <div className="text-center py-16">
             <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No Modules Available</h3>
-            <p className="text-gray-600 mb-6">This course doesn't have any modules yet.</p>
+            <p className="text-gray-600 mb-6">This course doesn&apos;t have any modules yet.</p>
             <button
               onClick={() => router.push('/courses')}
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"

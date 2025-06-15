@@ -137,7 +137,7 @@ const AgentChatBox = ({
         if (error.response?.status === 401) {
           errorText = "Your session has expired. Please sign in again to continue using the AI assistant.";
         } else if (error.response?.status === 403) {
-          errorText = "You don't have permission to use the AI assistant for this lesson.";
+          errorText = "You don&apos;t have permission to use the AI assistant for this lesson.";
         } else if (error.response?.data?.error) {
           errorText = error.response.data.error;
         }
