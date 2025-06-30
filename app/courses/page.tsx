@@ -22,7 +22,9 @@ export default function CoursesGrid() {
   useEffect(() => {
     async function fetchCourses() {
       try {
+        console.log('[CoursesGrid] Fetching courses from API...');
         const res = await api.get('/courses/');
+        console.log('[CoursesGrid] API response:', res);
         // Map API response to UI fields
         const mappedCourses: Course[] = (res.data || []).map((course: Record<string, unknown>) => ({
           id: course.id?.toString() ?? '',
@@ -43,9 +45,11 @@ export default function CoursesGrid() {
           image: (course.image as string) || '/assets/images/course/default.jpg',
           color: (course.color as string) || 'from-blue-500 to-purple-600',
         }));
+        console.log('[CoursesGrid] Mapped courses:', mappedCourses);
         setAllCourses(mappedCourses);
         setFilteredCourses(mappedCourses); // Initialize filteredCourses
-      } catch {
+      } catch (err) {
+        console.error('[CoursesGrid] Error fetching courses:', err);
         setAllCourses([]);
         setFilteredCourses([]); // Reset filteredCourses on error
       }
@@ -55,6 +59,7 @@ export default function CoursesGrid() {
 
   // Filter and sort courses
   useEffect(() => {
+    console.log('[CoursesGrid] Filtering and sorting courses...');
     let filtered = [...allCourses];
 
     // Apply filters
@@ -114,6 +119,7 @@ export default function CoursesGrid() {
     }
 
     setFilteredCourses(filtered);
+    console.log('[CoursesGrid] Filtered courses:', filtered);
   }, [allCourses, selectedCategories, selectedRatings, selectedInstructors, selectedPrice, selectedLevels, sortBy]);
 
   interface Course {

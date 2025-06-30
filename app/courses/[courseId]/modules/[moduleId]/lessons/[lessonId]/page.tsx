@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/lib/api';
 import { 
   BookOpen, 
   ArrowLeft, 
@@ -15,7 +15,9 @@ import {
   HelpCircle
 } from 'lucide-react';
 import AgentChatBox from '@/components/agent-chat/AgentChatBox';
+import LessonAssessmentModal from '@/components/lessons/LessonAssessmentModal';
 import { API_BASE_URL } from '@/lib/constants';
+import { getSession } from 'next-auth/react';
 
 interface Course {
   id: string;
@@ -37,6 +39,21 @@ interface Lesson {
   content?: string;
 }
 
+interface AssessmentQuestion {
+  id: number;
+  text: string;
+  choices: string[];
+  correct_answer: string;
+  explanation?: string;
+}
+interface Assessment {
+  id: number;
+  course: number;
+  title: string;
+  description: string;
+  questions: AssessmentQuestion[];
+}
+
 export default function LessonPage() {
   const router = useRouter();
   const params = useParams();
@@ -56,12 +73,15 @@ export default function LessonPage() {
   const [error, setError] = useState<string | null>(null);
   const [showChat, setShowChat] = useState(false);
   const [lessonCompleted, setLessonCompleted] = useState(false);
+  const [showAssessment, setShowAssessment] = useState(false);
+  const [assessment, setAssessment] = useState<Assessment | null>(null);
+  const [assessmentLoading, setAssessmentLoading] = useState(false);
 
   useEffect(() => {
     async function fetchCourseData() {
       try {
         setLoading(true);
-        const res = await axios.get(`${API_BASE_URL}/courses/${courseId}/details/`);
+        const res = await api.get(`${API_BASE_URL}/courses/${courseId}/details/`);
         const courseData: Course = res.data;
         setCourse(courseData);
 
@@ -99,13 +119,26 @@ export default function LessonPage() {
     }
   }, [courseId, moduleId, lessonId]);
 
-  const handleNextLesson = () => {
-    if (currentLessonIndex < allLessons.length - 1) {
-      const nextLesson = allLessons[currentLessonIndex + 1];
-      router.push(`/courses/${courseId}/modules/${moduleId}/lessons/${nextLesson.id}${level ? `?level=${level}` : ''}`);
-    } else {
-      // Go to module assessment or next module
-      router.push(`/courses/${courseId}/modules/${moduleId}/assessment${level ? `?level=${level}` : ''}`);
+  const handleNextLesson = async () => {
+    if (assessmentLoading || !currentLesson) return;
+    setAssessmentLoading(true);
+    try {
+      const session = await getSession();
+      const token = session?.accessToken;
+      if (!token) throw new Error('No access token found in session');
+      const res = await api.post(
+        `/lessons/${currentLesson.id}/generate-quiz/`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setAssessment(res.data.assessment ? res.data.assessment : res.data);
+      setShowAssessment(true);
+    } catch {
+      setAssessment(null);
+      setShowAssessment(false);
+      // Optionally, show a toast or error message here
+    } finally {
+      setAssessmentLoading(false);
     }
   };
 
@@ -113,6 +146,16 @@ export default function LessonPage() {
     if (currentLessonIndex > 0) {
       const prevLesson = allLessons[currentLessonIndex - 1];
       router.push(`/courses/${courseId}/modules/${moduleId}/lessons/${prevLesson.id}${level ? `?level=${level}` : ''}`);
+    }
+  };
+
+  const handleAssessmentContinue = () => {
+    setShowAssessment(false);
+    // Now do the navigation here
+    if (currentLessonIndex < allLessons.length - 1) {
+      router.push(`/courses/${courseId}/modules/${moduleId}/lessons/${allLessons[currentLessonIndex + 1].id}${level ? `?level=${level}` : ''}`);
+    } else {
+      router.push(`/courses/${courseId}/modules/${moduleId}/assessment${level ? `?level=${level}` : ''}`);
     }
   };
 
@@ -315,6 +358,7 @@ export default function LessonPage() {
 
                 <button
                   onClick={handleNextLesson}
+                  disabled={assessmentLoading}
                   className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
                   {isLastLesson ? 'Take Assessment' : 'Next Lesson'}
@@ -383,6 +427,16 @@ export default function LessonPage() {
           </div>
         </div>
       </div>
+
+      {/* Assessment Modal */}
+      {showAssessment && assessment && (
+        <LessonAssessmentModal
+          open={showAssessment}
+          onClose={() => setShowAssessment(false)}
+          assessment={assessment}
+          onContinue={handleAssessmentContinue}
+        />
+      )}
     </div>
   );
 }
