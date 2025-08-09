@@ -5,17 +5,20 @@ export const FeaturesSection = () => {
     {
       image: "/images/features/personalized-learning.jpg",
       title: "Personalized Learning Paths",
-      description: "Our AI algorithms analyze your learning style and recommend courses that match your goals."
+      description: "Our AI algorithms analyze your learning style and recommend courses that match your goals.",
+      blogUrl: "/blog/personalized-learning-paths"
     },
     {
       image: "/images/features/expert-instructors.jpg",
       title: "Expert Instructors",
-      description: "Learn from industry-leading experts who are passionate about teaching."
+      description: "Learn from industry-leading experts who are passionate about teaching.",
+      blogUrl: "/blog/expert-instructors"
     },
     {
       image: "/images/features/verified-certificates.jpg",
       title: "Verified Certificates",
-      description: "Earn verified certificates upon completion of courses to showcase your skills."
+      description: "Earn verified certificates upon completion of courses to showcase your skills.",
+      blogUrl: "/blog/verified-certificates"
     }
   ];
 
@@ -37,6 +40,7 @@ export const FeaturesSection = () => {
             image={feature.image}
             title={feature.title}
             description={feature.description}
+            blogUrl={feature.blogUrl}
           />
         ))}
       </div>

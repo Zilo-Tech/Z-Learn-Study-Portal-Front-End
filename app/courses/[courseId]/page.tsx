@@ -1,8 +1,8 @@
 "use client";
 import { notFound } from 'next/navigation';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+
 import axios from 'axios';
 import { Star, Clock, Users, Award, BookOpen, PlayCircle, Loader2 } from 'lucide-react';
 import { API_BASE_URL } from '@/lib/constants';
@@ -41,6 +41,7 @@ interface CourseDetail {
 
 export default function CourseDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const courseId = params.courseId as string;
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -79,6 +80,26 @@ export default function CourseDetailPage() {
 
     fetchCourse();
   }, [courseId]);
+
+  const handleEnroll = () => {
+    if (!course) return;
+    // Always allow users to see the course structure/level selection
+    router.push(`/level-selection?course=${course.id || courseId}`);
+  };
+
+  const handleStartLearning = () => {
+    if (!course) return;
+    
+    if (course.is_free) {
+      router.push(`/level-selection?course=${course.id || courseId}`);
+    } else {
+      const params = new URLSearchParams({
+        course: (course.id || courseId).toString(),
+        courseName: encodeURIComponent(course.title)
+      });
+      router.push(`/pricing?${params.toString()}`);
+    }
+  };
 
   if (loading) {
     return (
@@ -138,25 +159,25 @@ export default function CourseDetailPage() {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  href={`/level-selection?course=${course.id || courseId}`}
+                <button 
+                  onClick={handleEnroll}
                   className="bg-white text-[#446d6d] px-8 py-4 rounded-xl font-semibold text-lg hover:bg-gray-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-center"
                 >
                   <PlayCircle className="w-6 h-6 inline mr-2" />
                   Enroll Now
-                </Link>
+                </button>
                 
                 <div className="text-center sm:text-left">
                   <div className="text-3xl font-bold">
                     {course.is_free ? (
                       <span className="text-green-300">FREE</span>
                     ) : (
-                      <span>${course.price}</span>
+                      <span>{course.price.toLocaleString()} FCFA</span>
                     )}
                   </div>
                   {!course.is_free && course.originalPrice && (
                     <div className="text-gray-200 line-through text-lg">
-                      ${course.originalPrice}
+                      {course.originalPrice.toLocaleString()} FCFA
                     </div>
                   )}
                 </div>
@@ -270,23 +291,23 @@ export default function CourseDetailPage() {
                     {course.is_free ? (
                       <span className="text-green-600">FREE</span>
                     ) : (
-                      <span>${course.price}</span>
+                      <span>{course.price.toLocaleString()} FCFA</span>
                     )}
                   </div>
                   {!course.is_free && course.originalPrice && (
                     <div className="text-gray-500 line-through text-lg">
-                      ${course.originalPrice}
+                      {course.originalPrice.toLocaleString()} FCFA
                     </div>
                   )}
                 </div>
 
-                <Link 
-                  href={`/level-selection?course=${course.id || courseId}`}
-                  className="w-full bg-gradient-to-r from-[#446d6d] to-[#002424] text-white px-6 py-4 rounded-xl font-semibold text-lg hover:from-[#446d6d]/80 hover:to-[#002424]/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-center block mb-6"
+                <button 
+                  onClick={handleStartLearning}
+                  className="w-full bg-gradient-to-r from-[#446d6d] to-[#002424] text-white px-6 py-4 rounded-xl font-semibold text-lg hover:from-[#446d6d]/80 hover:to-[#002424]/80 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-center mb-6"
                 >
                   <PlayCircle className="w-6 h-6 inline mr-2" />
-                  Start Learning
-                </Link>
+                  {course.is_free ? 'Start Learning' : 'View Pricing'}
+                </button>
 
                 <div className="space-y-4 text-sm">
                   <div className="flex items-center justify-between py-2 border-b border-gray-100">

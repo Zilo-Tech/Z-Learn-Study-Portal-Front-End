@@ -349,11 +349,11 @@ export default function CoursesGrid() {
                       ) : (
                         <div className="flex items-center space-x-2">
                           <span className="text-lg font-bold text-green-600">
-                            ${course.price}
+                            {course.price.toLocaleString()} FCFA
                           </span>
                           {course.originalPrice && (
                             <span className="text-sm text-gray-500 line-through">
-                              ${course.originalPrice}
+                              {course.originalPrice.toLocaleString()} FCFA
                             </span>
                           )}
                         </div>

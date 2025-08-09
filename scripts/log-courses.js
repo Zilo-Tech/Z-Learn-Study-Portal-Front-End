@@ -1,7 +1,7 @@
 // Node.js script to fetch and log /courses/ API response in your VS Code terminal
 const axios = require('axios');
 
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8000'; // Change if needed
+const API_BASE_URL = process.env.API_BASE_URL || 'https://z-learn-study-portal-backend.onrender.com'; // Change if needed
 const accessToken = process.env.ACCESS_TOKEN || '';
 
 async function fetchCourses() {

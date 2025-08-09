@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { 
@@ -15,20 +15,80 @@ import {
   Settings,
   ChevronDown,
   GraduationCap,
+  Loader2,
 } from "lucide-react";
+import api from "@/lib/api";
+
+interface UserStats {
+  courses_enrolled: number;
+  courses_completed: number;
+  achievements: number;
+  total_learning_time?: number;
+  current_streak?: number;
+}
 
 const UserMenu = () => {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
-
-  if (!session) return null;
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const getInitials = (name: string) => {
     return name.split(' ').map(word => word.charAt(0)).join('').toUpperCase().slice(0, 2);
   };
 
-  const userDisplayName = session.user?.full_name || session.user?.name || session.user?.email || 'User';
-  const userRole = session.user?.is_instructor ? 'Instructor' : 'Student';
+  const userDisplayName = session?.user?.full_name || session?.user?.name || session?.user?.email || 'User';
+  const userRole = session?.user?.is_instructor ? 'Instructor' : 'Student';
+
+  const fetchUserStats = useCallback(async () => {
+    if (!session?.accessToken) return;
+    
+    try {
+      setLoading(true);
+      console.log('[UserMenu] Fetching user stats...');
+      
+      // Fetch dashboard summary which includes user stats
+      const response = await api.get('/user/dashboard/summary/');
+      console.log('[UserMenu] Dashboard summary response:', response.data);
+      
+      const stats: UserStats = {
+        courses_enrolled: response.data.user?.courses_enrolled || 0,
+        courses_completed: response.data.user?.courses_completed || 0,
+        achievements: response.data.user?.achievements || 0,
+        total_learning_time: response.data.user?.total_learning_time || 0,
+        current_streak: response.data.user?.current_streak || 0
+      };
+      
+      setUserStats(stats);
+      console.log('[UserMenu] User stats set:', stats);
+    } catch (error) {
+      console.error('[UserMenu] Error fetching user stats:', error);
+      // Fallback to session data if available
+      setUserStats({
+        courses_enrolled: session?.user?.courses_enrolled || 0,
+        courses_completed: session?.user?.courses_completed || 0,
+        achievements: session?.user?.achievements || 0
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [session?.accessToken, session?.user?.courses_enrolled, session?.user?.courses_completed, session?.user?.achievements]);
+
+  // Fetch user statistics when menu is opened
+  useEffect(() => {
+    if (isOpen && session?.accessToken && !userStats) {
+      fetchUserStats();
+    }
+  }, [isOpen, session?.accessToken, userStats, fetchUserStats]);
+
+  // Use dynamic stats if available, otherwise fall back to session data
+  const displayStats = userStats || {
+    courses_enrolled: session?.user?.courses_enrolled || 0,
+    courses_completed: session?.user?.courses_completed || 0,
+    achievements: session?.user?.achievements || 0
+  };
+
+  if (!session) return null;
 
   return (
     <div className="relative">
@@ -112,18 +172,46 @@ const UserMenu = () => {
           {/* User Stats */}
           <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-white/20">
             <div className="text-center">
-              <div className="font-bold text-lg">{session.user?.courses_enrolled || 0}</div>
+              <div className="font-bold text-lg flex items-center justify-center">
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  displayStats.courses_enrolled
+                )}
+              </div>
               <div className="text-xs text-blue-200">Enrolled</div>
             </div>
             <div className="text-center">
-              <div className="font-bold text-lg">{session.user?.courses_completed || 0}</div>
+              <div className="font-bold text-lg flex items-center justify-center">
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  displayStats.courses_completed
+                )}
+              </div>
               <div className="text-xs text-blue-200">Completed</div>
             </div>
             <div className="text-center">
-              <div className="font-bold text-lg">{session.user?.achievements || 0}</div>
+              <div className="font-bold text-lg flex items-center justify-center">
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  displayStats.achievements
+                )}
+              </div>
               <div className="text-xs text-blue-200">Achievements</div>
             </div>
           </div>
+
+          {/* Additional Stats (if available) */}
+          {userStats?.current_streak && (
+            <div className="mt-3 pt-3 border-t border-white/20">
+              <div className="flex justify-between text-sm">
+                <span className="text-blue-200">Current Streak:</span>
+                <span className="text-white font-semibold">{userStats.current_streak} days</span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Enhanced Content */}
@@ -137,21 +225,33 @@ const UserMenu = () => {
               <span className="font-semibold text-gray-900">Dashboard</span>
             </div>
             <div className="space-y-1">
-              <Link href="/dashboard" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group">
+              <Link 
+                href="/dashboard" 
+                className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group"
+                onClick={() => setIsOpen(false)}
+              >
                 <div className="flex items-center gap-3">
                   <TrendingUp className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
                   <span className="text-gray-700 group-hover:text-gray-900">My Learning</span>
                 </div>
                 <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600" />
               </Link>
-              <Link href="/achievements" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group">
+              <Link 
+                href="/dashboard?tab=achievements" 
+                className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group"
+                onClick={() => setIsOpen(false)}
+              >
                 <div className="flex items-center gap-3">
                   <Award className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
                   <span className="text-gray-700 group-hover:text-gray-900">Achievements</span>
                 </div>
                 <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600" />
               </Link>
-              <Link href="/dashboard" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group">
+              <Link 
+                href="/dashboard?tab=progress" 
+                className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group"
+                onClick={() => setIsOpen(false)}
+              >
                 <div className="flex items-center gap-3">
                   <GraduationCap className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
                   <span className="text-gray-700 group-hover:text-gray-900">Progress</span>
@@ -177,7 +277,11 @@ const UserMenu = () => {
                 </div>
                 <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-green-600" />
               </Link>
-              <Link href="/enrollments" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group">
+              <Link 
+                href="/dashboard?tab=courses" 
+                className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group"
+                onClick={() => setIsOpen(false)}
+              >
                 <div className="flex items-center gap-3">
                   <TrendingUp className="w-4 h-4 text-gray-400 group-hover:text-green-600" />
                   <span className="text-gray-700 group-hover:text-gray-900">My Enrollments</span>
@@ -196,14 +300,14 @@ const UserMenu = () => {
               <span className="font-semibold text-gray-900">Account</span>
             </div>
             <div className="space-y-1">
-              <Link href="/dashboard" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group">
+              <Link href="/profile/edit" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group">
                 <div className="flex items-center gap-3">
                   <User className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
                   <span className="text-gray-700 group-hover:text-gray-900">Update Profile</span>
                 </div>
                 <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-purple-600" />
               </Link>
-              <Link href="/dashboard" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group">
+              <Link href="/settings" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group">
                 <div className="flex items-center gap-3">
                   <Settings className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
                   <span className="text-gray-700 group-hover:text-gray-900">Settings</span>

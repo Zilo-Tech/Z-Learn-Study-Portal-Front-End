@@ -1,14 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface FeatureCardProps {
   image: string;
   title: string;
   description: string;
   ctaText?: string;
+  blogUrl?: string;
 }
 
-export const FeatureCard = ({ image, title, description, ctaText = "Learn more" }: FeatureCardProps) => {
+export const FeatureCard = ({ image, title, description, ctaText = "Learn more", blogUrl }: FeatureCardProps) => {
   return (
     <div className="flex flex-col h-full bg-white rounded-lg  border border-gray-200 overflow-hidden  transition-all duration-300">
       {/* Image container with Cisco-style aspect ratio */}
@@ -30,28 +32,51 @@ export const FeatureCard = ({ image, title, description, ctaText = "Learn more" 
           {description}
         </p>
         
-        {/* Cisco-style CTA */}
+        {/* Enhanced CTA with Blog Navigation */}
         <div className="mt-auto">
-          <a 
-            href="#"
-            className="inline-flex items-center text-brand font-medium group"
-            aria-label={`Learn more about ${title}`}
-          >
-            {ctaText}
-            <svg 
-              className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1"
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+          {blogUrl ? (
+            <Link 
+              href={blogUrl}
+              className="inline-flex items-center text-brand font-medium group hover:text-blue-700 transition-colors"
+              aria-label={`Learn more about ${title}`}
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M9 5l7 7-7 7" 
-              />
-            </svg>
-          </a>
+              {ctaText}
+              <svg 
+                className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M9 5l7 7-7 7" 
+                />
+              </svg>
+            </Link>
+          ) : (
+            <a 
+              href="#"
+              className="inline-flex items-center text-brand font-medium group"
+              aria-label={`Learn more about ${title}`}
+            >
+              {ctaText}
+              <svg 
+                className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1"
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M9 5l7 7-7 7" 
+                />
+              </svg>
+            </a>
+          )}
         </div>
       </div>
     </div>

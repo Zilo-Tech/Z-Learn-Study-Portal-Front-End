@@ -2,10 +2,14 @@
 import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Pause } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 const HeroSection = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const router = useRouter();
+  const { data: session } = useSession();
 
   const togglePlay = () => {
     if (videoRef.current) {
@@ -15,6 +19,16 @@ const HeroSection = () => {
         videoRef.current.play();
       }
       setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleStartTrial = () => {
+    if (session) {
+      // User is logged in, take them to courses
+      router.push('/courses');
+    } else {
+      // User is not logged in, take them to signup
+      router.push('/auth/signup');
     }
   };
 
@@ -90,16 +104,18 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
             <motion.button 
-              className="px-8 py-3 bg-brand hover:bg-brand/00 text-white font-medium rounded-lg transition-all duration-300"
+              className="px-8 py-3 bg-brand hover:bg-brand/90 text-white font-medium rounded-lg transition-all duration-300"
               whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(59, 130, 246, 0.3)" }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleStartTrial}
             >
-              Start Free Trial
+              {session ? 'Browse Courses' : 'Start Free Trial'}
             </motion.button>
             <motion.button 
               className="px-8 py-3 bg-transparent border-2 border-white text-white hover:bg-white/10 font-medium rounded-lg transition-all duration-300"
               whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.1)" }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/courses')}
             >
               Explore Courses
             </motion.button>

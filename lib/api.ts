@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from './constants';
+import { getSession } from 'next-auth/react';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -7,10 +8,14 @@ const api = axios.create({
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('accessToken'); // Or get from your auth state
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  async (config) => {
+    try {
+      const session = await getSession();
+      if (session?.accessToken) {
+        config.headers.Authorization = `Bearer ${session.accessToken}`;
+      }
+    } catch (error) {
+      console.error('Error getting session for API request:', error);
     }
     return config;
   },
@@ -29,15 +34,18 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        const response = await axios.post(`${api.defaults.baseURL}/token/refresh/`, {
-          refresh: refreshToken
-        });
-        
-        const { access } = response.data;
-        localStorage.setItem('accessToken', access);
-        originalRequest.headers.Authorization = `Bearer ${access}`;
-        return api(originalRequest);
+        const session = await getSession();
+        if (session?.refreshToken) {
+          const response = await axios.post(`${api.defaults.baseURL}/token/refresh/`, {
+            refresh: session.refreshToken
+          });
+          
+          const { access } = response.data;
+          // Note: In a real implementation, you'd want to update the session with the new token
+          // This might require additional session management logic
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+          return api(originalRequest);
+        }
       } catch (err) {
         // Handle refresh token failure (logout user)
         console.error('Refresh token failed', err);
