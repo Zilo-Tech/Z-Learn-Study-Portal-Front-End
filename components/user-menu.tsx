@@ -291,6 +291,32 @@ const UserMenu = () => {
             </div>
           </div>
 
+          {/* Community Section */}
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <Settings className="w-5 h-5 text-blue-600" />
+              </div>
+              <span className="font-semibold text-gray-900">Community</span>
+            </div>
+            <div className="space-y-1">
+              <Link href="/community" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group" onClick={() => setIsOpen(false)}>
+                <div className="flex items-center gap-3">
+                  <User className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                  <span className="text-gray-700 group-hover:text-gray-900">Community Feed</span>
+                </div>
+                <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600" />
+              </Link>
+              <Link href="/messages" className="flex justify-between items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group" onClick={() => setIsOpen(false)}>
+                <div className="flex items-center gap-3">
+                  <User className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
+                  <span className="text-gray-700 group-hover:text-gray-900">Direct Messages</span>
+                </div>
+                <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600" />
+              </Link>
+            </div>
+          </div>
+
           {/* Profile Section */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-4">

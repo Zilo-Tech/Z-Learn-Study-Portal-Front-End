@@ -37,7 +37,7 @@ export const FeatureCard = ({ image, title, description, ctaText = "Learn more",
           {blogUrl ? (
             <Link 
               href={blogUrl}
-              className="inline-flex items-center text-brand font-medium group hover:text-blue-700 transition-colors"
+              className="inline-flex items-center text-brand font-medium group hover:text-emerald-700 transition-colors"
               aria-label={`Learn more about ${title}`}
             >
               {ctaText}

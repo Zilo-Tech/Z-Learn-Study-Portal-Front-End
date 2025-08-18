@@ -51,7 +51,7 @@ const HeroSection = () => {
   Your browser does not support the video tag.
 </video>
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-brand/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-emerald-600/40"></div>
       </div>
 
       {/* Play/Pause Button - Top Right Corner */}
@@ -85,11 +85,11 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Transform Your Skills with <span className="text-brand">AI-Driven</span> Learning
+            Transform Your Skills with <span className="text-emerald-400">AI-Driven</span> Learning
           </motion.h1>
           
           <motion.p 
-            className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto"
+            className="text-lg md:text-xl text-emerald-100 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
@@ -104,8 +104,8 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
             <motion.button 
-              className="px-8 py-3 bg-brand hover:bg-brand/90 text-white font-medium rounded-lg transition-all duration-300"
-              whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(59, 130, 246, 0.3)" }}
+              className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-all duration-300"
+              whileHover={{ scale: 1.05, boxShadow: "0 10px 25px rgba(16, 185, 129, 0.35)" }}
               whileTap={{ scale: 0.95 }}
               onClick={handleStartTrial}
             >

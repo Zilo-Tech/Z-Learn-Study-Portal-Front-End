@@ -1,3 +1,4 @@
+"use client";
 // NavigationLinks.tsx
 import { usePathname } from 'next/navigation';
 import { NavigationItem } from '@/types/navigation';

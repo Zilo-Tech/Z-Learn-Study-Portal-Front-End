@@ -1,6 +1,7 @@
 "use client";
 import { Logo } from "@/components/ui/logo";
-import { AuthForm } from "../components/auth-form";
+// import { AuthForm } from "../components/auth-form";
+import SignupOnboardingForm from "../components/signup-onboarding";
 import { useEffect, useRef } from "react";
 
 export default function SignUpPage() {
@@ -55,9 +56,9 @@ export default function SignUpPage() {
       {/* Auth Form Section */}
       <div className="lg:p-8 w-full">
         
-      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[450px]">
-      <AuthForm type="signup" />
-        </div>
+      <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[520px]">
+        <SignupOnboardingForm />
+      </div>
       </div>
     </div>
   );

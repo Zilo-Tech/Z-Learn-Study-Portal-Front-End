@@ -4,15 +4,23 @@ import { getSession } from 'next-auth/react';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  headers: {
+    'Accept': 'application/json',
+  },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and JSON content type
 api.interceptors.request.use(
   async (config) => {
     try {
       const session = await getSession();
       if (session?.accessToken) {
         config.headers.Authorization = `Bearer ${session.accessToken}`;
+      }
+      // Set JSON Content-Type automatically unless this is a FormData upload
+      const isFormData = typeof FormData !== 'undefined' && config.data instanceof FormData;
+      if (!isFormData) {
+        config.headers['Content-Type'] = 'application/json';
       }
     } catch (error) {
       console.error('Error getting session for API request:', error);
@@ -49,7 +57,9 @@ api.interceptors.response.use(
       } catch (err) {
         // Handle refresh token failure (logout user)
         console.error('Refresh token failed', err);
-        window.location.href = '/auth/signin';
+        if (typeof window !== 'undefined') {
+          window.location.href = '/auth/signin';
+        }
         return Promise.reject(err);
       }
     }

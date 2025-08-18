@@ -17,7 +17,9 @@ const Header = () => {
   const navigationItems = [
     { id: 'home', name: 'Home', href: '/' },
     { id: 'courses', name: 'Courses', href: '/courses' },
-    { id: 'instructors', name: 'Instructors', href: '/instructors' },
+    { id: 'student', name: 'Student', href: '/student' },
+    { id: 'tutor', name: 'Tutors', href: '/tutor' },
+    { id: 'community', name: 'Community', href: '/community' },
     { id: 'pricing', name: 'Pricing', href: '/pricing' }
   ];
   const [isMenuOpen, setIsMenuOpen] = useState(false);
